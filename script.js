@@ -1,4 +1,4 @@
-const SUPABASE_URL = "https://pemasiezuewkboeuudys.supabase.co/rest/v1/";
+const SUPABASE_URL = "https://pemasiezuewkboeuudys.supabase.co";
 const SUPABASE_KEY = "sb_publishable_DveagRUAISleOisJ0B9TjA_fXXSyWJs";
 
 const CAPITAL_INICIAL = 540;
