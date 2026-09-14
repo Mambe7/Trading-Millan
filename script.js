@@ -14,9 +14,17 @@ const SUPABASE_KEY = "sb_publishable_DveagRUAISleOisJ0B9TjA_fXXSyWJs";
 
 const CAPITAL_INICIAL = 540;
 
+
+// ==========================================
+// VARIABLES GENERALES
+// ==========================================
+
 let registros = [];
+
 let capitalChart = null;
+
 let fechaCalendario = new Date();
+
 let usuarioActual = null;
 
 
@@ -24,13 +32,22 @@ let usuarioActual = null;
 // INICIAR APLICACIÓN
 // ==========================================
 
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-    mostrarFecha();
+        console.log(
+            "⚡ DOM CARGADO"
+        );
 
-    await comprobarSesion();
+        mostrarFecha();
 
-});
+        comprobarSesion();
+
+        iniciarSincronizacion();
+
+    }
+);
 
 
 // ==========================================
@@ -39,23 +56,39 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 function mostrarFecha() {
 
-    const elementoFecha = document.getElementById("fecha");
+    const elementoFecha =
+        document.getElementById(
+            "fecha"
+        );
 
     if (!elementoFecha) {
+
         return;
+
     }
 
-    const ahora = new Date();
+    const ahora =
+        new Date();
 
     const opciones = {
+
         weekday: "long",
+
         year: "numeric",
+
         month: "long",
+
         day: "numeric"
+
     };
 
     elementoFecha.textContent =
-        ahora.toLocaleDateString("es-CO", opciones).toUpperCase();
+        ahora
+            .toLocaleDateString(
+                "es-CO",
+                opciones
+            )
+            .toUpperCase();
 
 }
 
@@ -67,46 +100,76 @@ function mostrarFecha() {
 async function comprobarSesion() {
 
     const accessToken =
-        localStorage.getItem("millan_access_token");
+        localStorage.getItem(
+            "millan_access_token"
+        );
 
     if (!accessToken) {
 
         mostrarLogin();
 
         return;
+
     }
 
     try {
 
-        const respuesta = await fetch(
-            `${SUPABASE_URL}/auth/v1/user`,
-            {
-                method: "GET",
+        const respuesta =
+            await fetch(
 
-                headers: {
-                    "apikey": SUPABASE_KEY,
-                    "Authorization": `Bearer ${accessToken}`
+                `${SUPABASE_URL}/auth/v1/user`,
+
+                {
+
+                    method:
+                        "GET",
+
+                    headers: {
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            `Bearer ${accessToken}`
+
+                    }
+
                 }
-            }
-        );
+
+            );
+
 
         if (!respuesta.ok) {
 
-            localStorage.removeItem("millan_access_token");
-            localStorage.removeItem("millan_refresh_token");
+            localStorage.removeItem(
+                "millan_access_token"
+            );
+
+            localStorage.removeItem(
+                "millan_refresh_token"
+            );
 
             mostrarLogin();
 
             return;
+
         }
 
-        usuarioActual = await respuesta.json();
 
-        mostrarAplicacion();
+        usuarioActual =
+            await respuesta.json();
 
-    } catch (error) {
 
-        console.error("Error comprobando sesión:", error);
+        await mostrarAplicacion();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Error comprobando sesión:",
+            error
+        );
 
         mostrarLogin();
 
@@ -122,17 +185,29 @@ async function comprobarSesion() {
 function mostrarLogin() {
 
     const loginScreen =
-        document.getElementById("loginScreen");
+        document.getElementById(
+            "loginScreen"
+        );
 
     const app =
-        document.getElementById("app");
+        document.getElementById(
+            "app"
+        );
+
 
     if (loginScreen) {
-        loginScreen.style.display = "flex";
+
+        loginScreen.style.display =
+            "flex";
+
     }
 
+
     if (app) {
-        app.style.display = "none";
+
+        app.style.display =
+            "none";
+
     }
 
 }
@@ -145,18 +220,33 @@ function mostrarLogin() {
 async function mostrarAplicacion() {
 
     const loginScreen =
-        document.getElementById("loginScreen");
+        document.getElementById(
+            "loginScreen"
+        );
 
     const app =
-        document.getElementById("app");
+        document.getElementById(
+            "app"
+        );
+
 
     if (loginScreen) {
-        loginScreen.style.display = "none";
+
+        loginScreen.style.display =
+            "none";
+
     }
 
+
     if (app) {
-        app.style.display = "block";
+
+        app.style.display =
+            "block";
+
     }
+
+
+    mostrarFecha();
 
     await cargarDatos();
 
@@ -169,29 +259,28 @@ async function mostrarAplicacion() {
 
 async function iniciarSesion() {
 
-    const emailElemento =
-        document.getElementById("loginEmail");
-
-    const passwordElemento =
-        document.getElementById("loginPassword");
-
-    const mensaje =
-        document.getElementById("loginMessage");
-
-    if (!emailElemento || !passwordElemento || !mensaje) {
-
-        console.error(
-            "No se encontraron los elementos del formulario de login."
-        );
-
-        return;
-    }
-
     const email =
-        emailElemento.value.trim();
+        document
+            .getElementById(
+                "loginEmail"
+            )
+            .value
+            .trim();
+
 
     const password =
-        passwordElemento.value;
+        document
+            .getElementById(
+                "loginPassword"
+            )
+            .value;
+
+
+    const mensaje =
+        document.getElementById(
+            "loginMessage"
+        );
+
 
     if (!email || !password) {
 
@@ -199,64 +288,102 @@ async function iniciarSesion() {
             "Ingresa tu correo y contraseña.";
 
         return;
+
     }
+
 
     mensaje.textContent =
         "Iniciando sesión...";
 
+
     try {
 
-        const respuesta = await fetch(
-            `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
-            {
-                method: "POST",
+        const respuesta =
+            await fetch(
 
-                headers: {
-                    "Content-Type": "application/json",
-                    "apikey": SUPABASE_KEY
-                },
+                `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
 
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                })
-            }
-        );
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "apikey":
+                            SUPABASE_KEY
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            email:
+                                email,
+
+                            password:
+                                password
+
+                        })
+
+                }
+
+            );
+
 
         const datos =
             await respuesta.json();
 
-        console.log("Respuesta login:", datos);
 
         if (!respuesta.ok) {
 
+            console.error(
+                "Error de inicio:",
+                datos
+            );
+
             mensaje.textContent =
-                datos.error_description ||
-                datos.msg ||
                 "Correo o contraseña incorrectos.";
 
             return;
+
         }
 
-        localStorage.setItem(
-            "millan_access_token",
-            datos.access_token
-        );
 
         localStorage.setItem(
-            "millan_refresh_token",
-            datos.refresh_token
+
+            "millan_access_token",
+
+            datos.access_token
+
         );
+
+
+        localStorage.setItem(
+
+            "millan_refresh_token",
+
+            datos.refresh_token
+
+        );
+
 
         usuarioActual =
             datos.user;
 
+
         mensaje.textContent =
             "Acceso correcto.";
 
+
         await mostrarAplicacion();
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             "Error iniciando sesión:",
@@ -264,7 +391,7 @@ async function iniciarSesion() {
         );
 
         mensaje.textContent =
-            "No se pudo conectar con Supabase.";
+            "No se pudo conectar con el servidor.";
 
     }
 
@@ -278,25 +405,41 @@ async function iniciarSesion() {
 async function cerrarSesion() {
 
     const accessToken =
-        localStorage.getItem("millan_access_token");
+        localStorage.getItem(
+            "millan_access_token"
+        );
+
 
     if (accessToken) {
 
         try {
 
             await fetch(
+
                 `${SUPABASE_URL}/auth/v1/logout`,
+
                 {
-                    method: "POST",
+
+                    method:
+                        "POST",
 
                     headers: {
-                        "apikey": SUPABASE_KEY,
-                        "Authorization": `Bearer ${accessToken}`
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            `Bearer ${accessToken}`
+
                     }
+
                 }
+
             );
 
-        } catch (error) {
+        }
+
+        catch (error) {
 
             console.error(
                 "Error cerrando sesión:",
@@ -307,15 +450,20 @@ async function cerrarSesion() {
 
     }
 
+
     localStorage.removeItem(
         "millan_access_token"
     );
+
 
     localStorage.removeItem(
         "millan_refresh_token"
     );
 
-    usuarioActual = null;
+
+    usuarioActual =
+        null;
+
 
     mostrarLogin();
 
@@ -329,33 +477,50 @@ async function cerrarSesion() {
 async function cargarDatos() {
 
     const accessToken =
-        localStorage.getItem("millan_access_token");
+        localStorage.getItem(
+            "millan_access_token"
+        );
+
 
     if (!accessToken) {
 
-        mostrarLogin();
-
         return;
+
     }
+
 
     try {
 
-        const respuesta = await fetch(
-            `${SUPABASE_URL}/rest/v1/operaciones?select=*&order=Fecha.asc`,
-            {
-                method: "GET",
+        const respuesta =
+            await fetch(
 
-                headers: {
-                    "apikey": SUPABASE_KEY,
-                    "Authorization": `Bearer ${accessToken}`
+                `${SUPABASE_URL}/rest/v1/operaciones?select=*&order=Fecha.asc`,
+
+                {
+
+                    method:
+                        "GET",
+
+                    headers: {
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            `Bearer ${accessToken}`
+
+                    }
+
                 }
-            }
-        );
+
+            );
+
 
         if (!respuesta.ok) {
 
             const error =
                 await respuesta.text();
+
 
             console.error(
                 "Error cargando datos:",
@@ -363,14 +528,19 @@ async function cargarDatos() {
             );
 
             return;
+
         }
+
 
         registros =
             await respuesta.json();
 
+
         actualizarInterfaz();
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             "Error cargando datos:",
@@ -388,54 +558,140 @@ async function cargarDatos() {
 
 function actualizarInterfaz() {
 
-    let totalResultado = 0;
-    let totalOperaciones = 0;
+    let totalResultado =
+        0;
 
-    registros.forEach(function (registro) {
+    let totalOperaciones =
+        0;
 
-        totalResultado +=
-            Number(registro.Resultado) || 0;
 
-        totalOperaciones +=
-            Number(registro.Operaciones) || 0;
+    registros.forEach(
+        function (registro) {
 
-    });
+            totalResultado +=
+                Number(
+                    registro.Resultado
+                ) || 0;
 
-    const capitalActual =
-        CAPITAL_INICIAL + totalResultado;
 
-    const hoy =
-        new Date().toISOString().split("T")[0];
-
-    let resultadoHoy = 0;
-
-    registros.forEach(function (registro) {
-
-        if (registro.Fecha === hoy) {
-
-            resultadoHoy +=
-                Number(registro.Resultado) || 0;
+            totalOperaciones +=
+                Number(
+                    registro.Operaciones
+                ) || 0;
 
         }
+    );
 
-    });
+
+    const capitalActual =
+        CAPITAL_INICIAL +
+        totalResultado;
+
+
+    // Fecha local para Colombia
+
+    const ahora =
+        new Date();
+
+
+    const año =
+        ahora.getFullYear();
+
+
+    const mes =
+        String(
+            ahora.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    const dia =
+        String(
+            ahora.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    const hoy =
+        `${año}-${mes}-${dia}`;
+
+
+    let resultadoHoy =
+        0;
+
+
+    let operacionesHoy =
+        0;
+
+
+    registros.forEach(
+        function (registro) {
+
+            if (
+                registro.Fecha === hoy
+            ) {
+
+                resultadoHoy +=
+                    Number(
+                        registro.Resultado
+                    ) || 0;
+
+
+                operacionesHoy +=
+                    Number(
+                        registro.Operaciones
+                    ) || 0;
+
+            }
+
+        }
+    );
+
 
     const rentabilidad =
         CAPITAL_INICIAL !== 0
-            ? (totalResultado / CAPITAL_INICIAL) * 100
+
+            ? (
+                totalResultado /
+                CAPITAL_INICIAL
+            ) * 100
+
             : 0;
 
+
     const capitalElemento =
-        document.getElementById("capital");
+        document.getElementById(
+            "capital"
+        );
+
 
     const resultadoElemento =
-        document.getElementById("resultado");
+        document.getElementById(
+            "resultado"
+        );
+
 
     const operacionesElemento =
-        document.getElementById("operaciones");
+        document.getElementById(
+            "operaciones"
+        );
+
 
     const rentabilidadElemento =
-        document.getElementById("rentabilidad");
+        document.getElementById(
+            "rentabilidad"
+        );
+
+
+    const resultadoTexto =
+        document.getElementById(
+            "resultadoTexto"
+        );
+
 
     if (capitalElemento) {
 
@@ -444,19 +700,24 @@ function actualizarInterfaz() {
 
     }
 
+
     if (resultadoElemento) {
 
         resultadoElemento.textContent =
-            formatearResultado(resultadoHoy);
+            formatearResultado(
+                resultadoHoy
+            );
 
     }
+
 
     if (operacionesElemento) {
 
         operacionesElemento.textContent =
-            totalOperaciones;
+            operacionesHoy;
 
     }
+
 
     if (rentabilidadElemento) {
 
@@ -464,6 +725,33 @@ function actualizarInterfaz() {
             `${rentabilidad.toFixed(2)}%`;
 
     }
+
+
+    if (resultadoTexto) {
+
+        if (resultadoHoy > 0) {
+
+            resultadoTexto.textContent =
+                "Día positivo 📈";
+
+        }
+
+        else if (resultadoHoy < 0) {
+
+            resultadoTexto.textContent =
+                "Día negativo 📉";
+
+        }
+
+        else {
+
+            resultadoTexto.textContent =
+                "Sin operaciones";
+
+        }
+
+    }
+
 
     mostrarHistorial();
 
@@ -485,17 +773,20 @@ function formatearResultado(valor) {
     const numero =
         Number(valor) || 0;
 
+
     if (numero > 0) {
 
         return `+$${numero.toFixed(2)}`;
 
     }
 
+
     if (numero < 0) {
 
         return `-$${Math.abs(numero).toFixed(2)}`;
 
     }
+
 
     return "$0.00";
 
@@ -509,50 +800,93 @@ function formatearResultado(valor) {
 async function registrarResultado() {
 
     const accessToken =
-        localStorage.getItem("millan_access_token");
+        localStorage.getItem(
+            "millan_access_token"
+        );
+
 
     if (!accessToken) {
 
         mostrarLogin();
 
         return;
+
     }
 
+
     const gananciaInput =
-        document.getElementById("ganancia");
+        document.getElementById(
+            "ganancia"
+        );
+
 
     const operacionesInput =
-        document.getElementById("numeroOperaciones");
+        document.getElementById(
+            "numeroOperaciones"
+        );
+
 
     const resultado =
-        Number(gananciaInput.value);
+        Number(
+            gananciaInput.value
+        );
+
 
     const operaciones =
-        Number(operacionesInput.value);
+        Number(
+            operacionesInput.value
+        );
 
-    if (isNaN(resultado)) {
+
+    if (
+        gananciaInput.value === "" ||
+        isNaN(resultado)
+    ) {
 
         alert(
             "Ingresa un resultado válido."
         );
 
         return;
+
     }
 
-    if (isNaN(operaciones) || operaciones < 1) {
+
+    if (
+        isNaN(operaciones) ||
+        operaciones < 1
+    ) {
 
         alert(
             "Ingresa un número de operaciones válido."
         );
 
         return;
+
     }
 
+
+    const ahora =
+        new Date();
+
+
     const hoy =
-        new Date().toISOString().split("T")[0];
+        `${ahora.getFullYear()}-${String(
+            ahora.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        )}-${String(
+            ahora.getDate()
+        ).padStart(
+            2,
+            "0"
+        )}`;
+
 
     let nombreUsuario =
-        "Usuario";
+        "USUARIO";
+
 
     if (
         usuarioActual &&
@@ -562,19 +896,26 @@ async function registrarResultado() {
         const email =
             usuarioActual.email.toLowerCase();
 
-        if (email.includes("juan")) {
+
+        if (
+            email.includes("juan")
+        ) {
 
             nombreUsuario =
                 "JUAN MILLAN GRISALES";
 
-        } else if (
+        }
+
+        else if (
             email.includes("edilberto")
         ) {
 
             nombreUsuario =
                 "EDILBERTO MILLAN";
 
-        } else {
+        }
+
+        else {
 
             nombreUsuario =
                 usuarioActual.email;
@@ -583,35 +924,65 @@ async function registrarResultado() {
 
     }
 
+
     const nuevoRegistro = {
 
-        Fecha: hoy,
-        Resultado: resultado,
-        Operaciones: operaciones,
-        Usuario: nombreUsuario
+        Fecha:
+            hoy,
+
+        Resultado:
+            resultado,
+
+        Operaciones:
+            operaciones,
+
+        Usuario:
+            nombreUsuario
 
     };
 
+
     try {
 
-        const respuesta = await fetch(
-            `${SUPABASE_URL}/rest/v1/operaciones`,
-            {
-                method: "POST",
+        const respuesta =
+            await fetch(
 
-                headers: {
-                    "Content-Type": "application/json",
-                    "apikey": SUPABASE_KEY,
-                    "Authorization": `Bearer ${accessToken}`,
-                    "Prefer": "return=representation"
-                },
+                `${SUPABASE_URL}/rest/v1/operaciones`,
 
-                body: JSON.stringify(nuevoRegistro)
-            }
-        );
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json",
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            `Bearer ${accessToken}`,
+
+                        "Prefer":
+                            "return=representation"
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            nuevoRegistro
+                        )
+
+                }
+
+            );
+
 
         const datos =
             await respuesta.text();
+
 
         if (!respuesta.ok) {
 
@@ -620,32 +991,44 @@ async function registrarResultado() {
                 datos
             );
 
+
             alert(
-                "No se pudo registrar el resultado.\n\n" +
+                "No se pudo registrar.\n\n" +
                 datos
             );
 
             return;
+
         }
 
-        gananciaInput.value = "";
-        operacionesInput.value = "";
+
+        gananciaInput.value =
+            "";
+
+
+        operacionesInput.value =
+            "";
+
 
         alert(
             "Resultado registrado correctamente."
         );
 
+
         await cargarDatos();
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             "Error:",
             error
         );
 
+
         alert(
-            "Error de conexión con Supabase."
+            "Error de conexión."
         );
 
     }
@@ -660,44 +1043,113 @@ async function registrarResultado() {
 function mostrarHistorial() {
 
     const historial =
-        document.getElementById("historial");
+        document.getElementById(
+            "historial"
+        );
+
 
     if (!historial) {
+
         return;
+
     }
 
-    historial.innerHTML = "";
+
+    historial.innerHTML =
+        "";
+
 
     const registrosOrdenados =
         [...registros].reverse();
 
-    registrosOrdenados.forEach(function (registro) {
 
-        const fila =
-            document.createElement("tr");
+    registrosOrdenados.forEach(
+        function (registro) {
 
-        const clase =
-            Number(registro.Resultado) >= 0
-                ? "positive"
-                : "negative";
+            const fila =
+                document.createElement(
+                    "tr"
+                );
 
-        fila.innerHTML = `
 
-            <td>${registro.Fecha}</td>
+            const clase =
+                Number(
+                    registro.Resultado
+                ) >= 0
 
-            <td>${registro.Usuario || "Usuario"}</td>
+                    ? "positive"
 
-            <td class="${clase}">
-                ${formatearResultado(registro.Resultado)}
-            </td>
+                    : "negative";
 
-            <td>${registro.Operaciones}</td>
 
-        `;
+            fila.innerHTML = `
 
-        historial.appendChild(fila);
+                <td>
+                    ${formatearFecha(registro.Fecha)}
+                </td>
 
-    });
+                <td>
+                    ${registro.Usuario || "USUARIO"}
+                </td>
+
+                <td class="${clase}">
+                    ${formatearResultado(
+                        registro.Resultado
+                    )}
+                </td>
+
+                <td>
+                    ${registro.Operaciones}
+                </td>
+
+            `;
+
+
+            historial.appendChild(
+                fila
+            );
+
+        }
+    );
+
+}
+
+
+// ==========================================
+// FORMATEAR FECHA
+// ==========================================
+
+function formatearFecha(fecha) {
+
+    if (!fecha) {
+
+        return "";
+
+    }
+
+
+    const partes =
+        fecha.split(
+            "-"
+        );
+
+
+    if (
+        partes.length !== 3
+    ) {
+
+        return fecha;
+
+    }
+
+
+    return (
+        partes[2] +
+        "/" +
+        partes[1] +
+        "/" +
+        partes[0]
+    );
 
 }
 
@@ -708,45 +1160,71 @@ function mostrarHistorial() {
 
 function actualizarEstadisticas() {
 
-    let totalGanancia = 0;
-    let totalOperaciones = 0;
+    let totalGanancia =
+        0;
+
+    let totalOperaciones =
+        0;
+
 
     const dias =
         new Set();
 
-    registros.forEach(function (registro) {
 
-        totalGanancia +=
-            Number(registro.Resultado) || 0;
+    registros.forEach(
+        function (registro) {
 
-        totalOperaciones +=
-            Number(registro.Operaciones) || 0;
+            totalGanancia +=
+                Number(
+                    registro.Resultado
+                ) || 0;
 
-        if (registro.Fecha) {
 
-            dias.add(
-                registro.Fecha
-            );
+            totalOperaciones +=
+                Number(
+                    registro.Operaciones
+                ) || 0;
+
+
+            if (registro.Fecha) {
+
+                dias.add(
+                    registro.Fecha
+                );
+
+            }
 
         }
+    );
 
-    });
 
     const gananciaElemento =
-        document.getElementById("gananciaTotal");
+        document.getElementById(
+            "gananciaTotal"
+        );
+
 
     const operacionesElemento =
-        document.getElementById("totalOperaciones");
+        document.getElementById(
+            "totalOperaciones"
+        );
+
 
     const diasElemento =
-        document.getElementById("diasRegistrados");
+        document.getElementById(
+            "diasRegistrados"
+        );
+
 
     if (gananciaElemento) {
 
         gananciaElemento.textContent =
-            formatearResultado(totalGanancia);
+            formatearResultado(
+                totalGanancia
+            );
 
     }
+
 
     if (operacionesElemento) {
 
@@ -754,6 +1232,7 @@ function actualizarEstadisticas() {
             totalOperaciones;
 
     }
+
 
     if (diasElemento) {
 
@@ -772,51 +1251,62 @@ function actualizarEstadisticas() {
 function actualizarGrafico() {
 
     const canvas =
-        document.getElementById("capitalChart");
-
-    if (!canvas) {
-        return;
-    }
-
-    if (typeof Chart === "undefined") {
-
-        console.warn(
-            "Chart.js no está cargado."
+        document.getElementById(
+            "capitalChart"
         );
 
+
+    if (!canvas) {
+
         return;
+
     }
 
-    const acumuladoPorFecha = {};
 
-    let acumulado =
+    if (
+        typeof Chart === "undefined"
+    ) {
+
+        return;
+
+    }
+
+
+    let capital =
         CAPITAL_INICIAL;
 
-    registros.forEach(function (registro) {
-
-        const fecha =
-            registro.Fecha;
-
-        const resultado =
-            Number(registro.Resultado) || 0;
-
-        acumulado +=
-            resultado;
-
-        acumuladoPorFecha[fecha] =
-            acumulado;
-
-    });
 
     const fechas =
-        Object.keys(acumuladoPorFecha);
+        ["INICIO"];
+
 
     const capitales =
-        fechas.map(function (fecha) {
+        [capital];
 
-            return acumuladoPorFecha[fecha];
 
-        });
+    registros.forEach(
+        function (registro) {
+
+            capital +=
+                Number(
+                    registro.Resultado
+                ) || 0;
+
+
+            fechas.push(
+                formatearFecha(
+                    registro.Fecha
+                )
+            );
+
+
+            capitales.push(
+                capital
+            );
+
+        }
+    );
+
 
     if (capitalChart) {
 
@@ -824,39 +1314,73 @@ function actualizarGrafico() {
 
     }
 
+
     capitalChart =
         new Chart(
+
             canvas,
+
             {
-                type: "line",
+
+                type:
+                    "line",
 
                 data: {
 
-                    labels: fechas,
+                    labels:
+                        fechas,
 
                     datasets: [
+
                         {
-                            label: "Capital",
 
-                            data: capitales,
+                            label:
+                                "Capital USD",
 
-                            tension: 0.3,
+                            data:
+                                capitales,
 
-                            fill: false
+                            tension:
+                                0.3,
+
+                            fill:
+                                true,
+
+                            pointRadius:
+                                4,
+
+                            pointHoverRadius:
+                                6
+
                         }
+
                     ]
 
                 },
 
                 options: {
 
-                    responsive: true,
+                    responsive:
+                        true,
 
-                    maintainAspectRatio: false
+                    maintainAspectRatio:
+                        false,
+
+                    plugins: {
+
+                        legend: {
+
+                            display:
+                                true
+
+                        }
+
+                    }
 
                 }
 
             }
+
         );
 
 }
@@ -869,20 +1393,34 @@ function actualizarGrafico() {
 function actualizarCalendario() {
 
     const calendario =
-        document.getElementById("calendarioDias");
+        document.getElementById(
+            "calendarioDias"
+        );
+
 
     const titulo =
-        document.getElementById("mesActual");
+        document.getElementById(
+            "mesActual"
+        );
 
-    if (!calendario || !titulo) {
+
+    if (
+        !calendario ||
+        !titulo
+    ) {
+
         return;
+
     }
+
 
     const año =
         fechaCalendario.getFullYear();
 
+
     const mes =
         fechaCalendario.getMonth();
+
 
     const nombresMeses = [
 
@@ -901,23 +1439,47 @@ function actualizarCalendario() {
 
     ];
 
+
     titulo.textContent =
         `${nombresMeses[mes]} ${año}`;
 
-    calendario.innerHTML = "";
+
+    calendario.innerHTML =
+        "";
+
 
     const primerDia =
-        new Date(año, mes, 1);
+        new Date(
+            año,
+            mes,
+            1
+        );
+
 
     let diaSemana =
         primerDia.getDay();
 
+
+    // Domingo pasa al final
+    // porque el calendario empieza lunes
+
     if (diaSemana === 0) {
-        diaSemana = 7;
+
+        diaSemana =
+            7;
+
     }
 
+
     const ultimoDia =
-        new Date(año, mes + 1, 0).getDate();
+        new Date(
+            año,
+            mes + 1,
+            0
+        ).getDate();
+
+
+    // Espacios vacíos
 
     for (
         let i = 1;
@@ -926,16 +1488,23 @@ function actualizarCalendario() {
     ) {
 
         const espacio =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         espacio.className =
             "calendar-day empty";
+
 
         calendario.appendChild(
             espacio
         );
 
     }
+
+
+    // Crear días
 
     for (
         let dia = 1;
@@ -944,49 +1513,79 @@ function actualizarCalendario() {
     ) {
 
         const elemento =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         elemento.className =
             "calendar-day";
 
+
         const numeroDia =
-            document.createElement("span");
+            document.createElement(
+                "span"
+            );
+
 
         numeroDia.className =
             "day-number";
 
+
         numeroDia.textContent =
             dia;
+
 
         elemento.appendChild(
             numeroDia
         );
 
-        const mesTexto =
-            String(mes + 1).padStart(2, "0");
-
-        const diaTexto =
-            String(dia).padStart(2, "0");
 
         const fecha =
-            `${año}-${mesTexto}-${diaTexto}`;
+            `${año}-${String(
+                mes + 1
+            ).padStart(
+                2,
+                "0"
+            )}-${String(
+                dia
+            ).padStart(
+                2,
+                "0"
+            )}`;
 
-        let resultadoDia = 0;
-        let operacionesDia = 0;
 
-        registros.forEach(function (registro) {
+        let resultadoDia =
+            0;
 
-            if (registro.Fecha === fecha) {
 
-                resultadoDia +=
-                    Number(registro.Resultado) || 0;
+        let operacionesDia =
+            0;
 
-                operacionesDia +=
-                    Number(registro.Operaciones) || 0;
+
+        registros.forEach(
+            function (registro) {
+
+                if (
+                    registro.Fecha === fecha
+                ) {
+
+                    resultadoDia +=
+                        Number(
+                            registro.Resultado
+                        ) || 0;
+
+
+                    operacionesDia +=
+                        Number(
+                            registro.Operaciones
+                        ) || 0;
+
+                }
 
             }
+        );
 
-        });
 
         if (resultadoDia > 0) {
 
@@ -994,13 +1593,17 @@ function actualizarCalendario() {
                 "positive"
             );
 
-        } else if (resultadoDia < 0) {
+        }
+
+        else if (resultadoDia < 0) {
 
             elemento.classList.add(
                 "negative"
             );
 
-        } else {
+        }
+
+        else {
 
             elemento.classList.add(
                 "neutral"
@@ -1008,29 +1611,73 @@ function actualizarCalendario() {
 
         }
 
+
+        // Mostrar resultado
+
         if (resultadoDia !== 0) {
 
             const resultado =
-                document.createElement("small");
+                document.createElement(
+                    "small"
+                );
+
 
             resultado.textContent =
-                formatearResultado(resultadoDia);
+                formatearResultado(
+                    resultadoDia
+                );
+
 
             elemento.appendChild(
                 resultado
             );
 
+
             const operaciones =
-                document.createElement("small");
+                document.createElement(
+                    "small"
+                );
+
 
             operaciones.textContent =
                 `${operacionesDia} ops`;
+
 
             elemento.appendChild(
                 operaciones
             );
 
         }
+
+
+        // Marcar día actual
+
+        const ahora =
+            new Date();
+
+
+        const fechaHoy =
+            `${ahora.getFullYear()}-${String(
+                ahora.getMonth() + 1
+            ).padStart(
+                2,
+                "0"
+            )}-${String(
+                ahora.getDate()
+            ).padStart(
+                2,
+                "0"
+            )}`;
+
+
+        if (fecha === fechaHoy) {
+
+            elemento.classList.add(
+                "today"
+            );
+
+        }
+
 
         calendario.appendChild(
             elemento
@@ -1047,9 +1694,17 @@ function actualizarCalendario() {
 
 function mesAnterior() {
 
-    fechaCalendario.setMonth(
-        fechaCalendario.getMonth() - 1
-    );
+    fechaCalendario =
+        new Date(
+
+            fechaCalendario.getFullYear(),
+
+            fechaCalendario.getMonth() - 1,
+
+            1
+
+        );
+
 
     actualizarCalendario();
 
@@ -1062,9 +1717,17 @@ function mesAnterior() {
 
 function mesSiguiente() {
 
-    fechaCalendario.setMonth(
-        fechaCalendario.getMonth() + 1
-    );
+    fechaCalendario =
+        new Date(
+
+            fechaCalendario.getFullYear(),
+
+            fechaCalendario.getMonth() + 1,
+
+            1
+
+        );
+
 
     actualizarCalendario();
 
@@ -1082,67 +1745,91 @@ async function borrarHistorial() {
             "¿Seguro que quieres borrar todo el historial?"
         );
 
+
     if (!confirmar) {
+
         return;
+
     }
 
+
     const accessToken =
-        localStorage.getItem("millan_access_token");
+        localStorage.getItem(
+            "millan_access_token"
+        );
+
 
     if (!accessToken) {
 
         mostrarLogin();
 
         return;
+
     }
+
 
     try {
 
-        const respuesta = await fetch(
-            `${SUPABASE_URL}/rest/v1/operaciones?id=not.is.null`,
-            {
-                method: "DELETE",
+        const respuesta =
+            await fetch(
 
-                headers: {
-                    "apikey": SUPABASE_KEY,
-                    "Authorization": `Bearer ${accessToken}`
+                `${SUPABASE_URL}/rest/v1/operaciones?id=not.is.null`,
+
+                {
+
+                    method:
+                        "DELETE",
+
+                    headers: {
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            `Bearer ${accessToken}`
+
+                    }
+
                 }
-            }
-        );
+
+            );
+
 
         if (!respuesta.ok) {
 
             const error =
                 await respuesta.text();
 
+
             console.error(
-                "Error borrando historial:",
+                "Error borrando:",
                 error
             );
 
+
             alert(
-                "No se pudo borrar el historial.\n\n" +
-                error
+                "No se pudo borrar el historial."
             );
 
             return;
+
         }
+
 
         alert(
             "Historial borrado correctamente."
         );
 
+
         await cargarDatos();
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(
             "Error:",
             error
-        );
-
-        alert(
-            "Error de conexión."
         );
 
     }
@@ -1151,7 +1838,43 @@ async function borrarHistorial() {
 
 
 // ==========================================
-// HACER FUNCIONES GLOBALES
+// SINCRONIZACIÓN AUTOMÁTICA
+// ==========================================
+
+function iniciarSincronizacion() {
+
+    console.log(
+        "🔄 Sincronización automática iniciada"
+    );
+
+
+    setInterval(
+
+        async function () {
+
+            const token =
+                localStorage.getItem(
+                    "millan_access_token"
+                );
+
+
+            if (token) {
+
+                await cargarDatos();
+
+            }
+
+        },
+
+        3000
+
+    );
+
+}
+
+
+// ==========================================
+// FUNCIONES GLOBALES
 // ==========================================
 
 window.iniciarSesion =
@@ -1166,6 +1889,9 @@ window.registrarResultado =
 window.borrarHistorial =
     borrarHistorial;
 
+window.actualizarInterfaz =
+    actualizarInterfaz;
+
 window.actualizarCalendario =
     actualizarCalendario;
 
@@ -1174,26 +1900,3 @@ window.mesAnterior =
 
 window.mesSiguiente =
     mesSiguiente;
-
-
-// ==========================================
-// ACTUALIZACIÓN AUTOMÁTICA
-// ==========================================
-
-setInterval(
-    async function () {
-
-        const token =
-            localStorage.getItem(
-                "millan_access_token"
-            );
-
-        if (token) {
-
-            await cargarDatos();
-
-        }
-
-    },
-    5000
-);
