@@ -42,8 +42,6 @@ document.addEventListener(
 
         mostrarFecha();
 
-        comprobarSesion();
-
         iniciarSincronizacion();
 
     }
@@ -62,9 +60,7 @@ function mostrarFecha() {
         );
 
     if (!elementoFecha) {
-
         return;
-
     }
 
     const ahora =
@@ -89,6 +85,65 @@ function mostrarFecha() {
                 opciones
             )
             .toUpperCase();
+
+}
+
+
+// ==========================================
+// MOSTRAR USUARIO CONECTADO
+// ==========================================
+
+function actualizarUsuarioConectado() {
+
+    const elemento =
+        document.getElementById(
+            "usuarioActual"
+        );
+
+    if (!elemento) {
+        return;
+    }
+
+    let nombre =
+        "USUARIO";
+
+    if (
+        usuarioActual &&
+        usuarioActual.email
+    ) {
+
+        const email =
+            usuarioActual.email.toLowerCase();
+
+        if (
+            email.includes("juan")
+        ) {
+
+            nombre =
+                "JUAN MILLAN GRISALES";
+
+        }
+
+        else if (
+            email.includes("edilberto")
+        ) {
+
+            nombre =
+                "EDILBERTO MILLAN";
+
+        }
+
+        else {
+
+            nombre =
+                usuarioActual.email;
+
+        }
+
+    }
+
+    elemento.textContent =
+        nombre;
 
 }
 
@@ -121,8 +176,7 @@ async function comprobarSesion() {
 
                 {
 
-                    method:
-                        "GET",
+                    method: "GET",
 
                     headers: {
 
@@ -248,6 +302,8 @@ async function mostrarAplicacion() {
 
     mostrarFecha();
 
+    actualizarUsuarioConectado();
+
     await cargarDatos();
 
 }
@@ -282,7 +338,10 @@ async function iniciarSesion() {
         );
 
 
-    if (!email || !password) {
+    if (
+        !email ||
+        !password
+    ) {
 
         mensaje.textContent =
             "Ingresa tu correo y contraseña.";
@@ -305,8 +364,7 @@ async function iniciarSesion() {
 
                 {
 
-                    method:
-                        "POST",
+                    method: "POST",
 
                     headers: {
 
@@ -354,25 +412,22 @@ async function iniciarSesion() {
 
 
         localStorage.setItem(
-
             "millan_access_token",
-
             datos.access_token
-
         );
 
 
         localStorage.setItem(
-
             "millan_refresh_token",
-
             datos.refresh_token
-
         );
 
 
         usuarioActual =
             datos.user;
+
+
+        actualizarUsuarioConectado();
 
 
         mensaje.textContent =
@@ -420,8 +475,7 @@ async function cerrarSesion() {
 
                 {
 
-                    method:
-                        "POST",
+                    method: "POST",
 
                     headers: {
 
@@ -465,6 +519,9 @@ async function cerrarSesion() {
         null;
 
 
+    actualizarUsuarioConectado();
+
+
     mostrarLogin();
 
 }
@@ -483,9 +540,7 @@ async function cargarDatos() {
 
 
     if (!accessToken) {
-
         return;
-
     }
 
 
@@ -498,8 +553,7 @@ async function cargarDatos() {
 
                 {
 
-                    method:
-                        "GET",
+                    method: "GET",
 
                     headers: {
 
@@ -520,7 +574,6 @@ async function cargarDatos() {
 
             const error =
                 await respuesta.text();
-
 
             console.error(
                 "Error cargando datos:",
@@ -587,8 +640,6 @@ function actualizarInterfaz() {
         CAPITAL_INICIAL +
         totalResultado;
 
-
-    // Fecha local para Colombia
 
     const ahora =
         new Date();
@@ -951,8 +1002,7 @@ async function registrarResultado() {
 
                 {
 
-                    method:
-                        "POST",
+                    method: "POST",
 
                     headers: {
 
@@ -991,7 +1041,6 @@ async function registrarResultado() {
                 datos
             );
 
-
             alert(
                 "No se pudo registrar.\n\n" +
                 datos
@@ -1026,7 +1075,6 @@ async function registrarResultado() {
             error
         );
 
-
         alert(
             "Error de conexión."
         );
@@ -1049,9 +1097,7 @@ function mostrarHistorial() {
 
 
     if (!historial) {
-
         return;
-
     }
 
 
@@ -1085,7 +1131,9 @@ function mostrarHistorial() {
             fila.innerHTML = `
 
                 <td>
-                    ${formatearFecha(registro.Fecha)}
+                    ${formatearFecha(
+                        registro.Fecha
+                    )}
                 </td>
 
                 <td>
@@ -1122,16 +1170,12 @@ function mostrarHistorial() {
 function formatearFecha(fecha) {
 
     if (!fecha) {
-
         return "";
-
     }
 
 
     const partes =
-        fecha.split(
-            "-"
-        );
+        fecha.split("-");
 
 
     if (
@@ -1257,18 +1301,15 @@ function actualizarGrafico() {
 
 
     if (!canvas) {
-
         return;
-
     }
 
 
     if (
-        typeof Chart === "undefined"
+        typeof Chart ===
+        "undefined"
     ) {
-
         return;
-
     }
 
 
@@ -1408,9 +1449,7 @@ function actualizarCalendario() {
         !calendario ||
         !titulo
     ) {
-
         return;
-
     }
 
 
@@ -1460,9 +1499,6 @@ function actualizarCalendario() {
         primerDia.getDay();
 
 
-    // Domingo pasa al final
-    // porque el calendario empieza lunes
-
     if (diaSemana === 0) {
 
         diaSemana =
@@ -1478,8 +1514,6 @@ function actualizarCalendario() {
             0
         ).getDate();
 
-
-    // Espacios vacíos
 
     for (
         let i = 1;
@@ -1504,8 +1538,6 @@ function actualizarCalendario() {
     }
 
 
-    // Crear días
-
     for (
         let dia = 1;
         dia <= ultimoDia;
@@ -1529,7 +1561,7 @@ function actualizarCalendario() {
 
 
         numeroDia.className =
-            "day-number";
+            "calendar-number";
 
 
         numeroDia.textContent =
@@ -1567,7 +1599,8 @@ function actualizarCalendario() {
             function (registro) {
 
                 if (
-                    registro.Fecha === fecha
+                    registro.Fecha ===
+                    fecha
                 ) {
 
                     resultadoDia +=
@@ -1595,7 +1628,9 @@ function actualizarCalendario() {
 
         }
 
-        else if (resultadoDia < 0) {
+        else if (
+            resultadoDia < 0
+        ) {
 
             elemento.classList.add(
                 "negative"
@@ -1612,14 +1647,18 @@ function actualizarCalendario() {
         }
 
 
-        // Mostrar resultado
-
-        if (resultadoDia !== 0) {
+        if (
+            resultadoDia !== 0
+        ) {
 
             const resultado =
                 document.createElement(
                     "small"
                 );
+
+
+            resultado.className =
+                "calendar-result";
 
 
             resultado.textContent =
@@ -1650,8 +1689,6 @@ function actualizarCalendario() {
         }
 
 
-        // Marcar día actual
-
         const ahora =
             new Date();
 
@@ -1670,7 +1707,9 @@ function actualizarCalendario() {
             )}`;
 
 
-        if (fecha === fechaHoy) {
+        if (
+            fecha === fechaHoy
+        ) {
 
             elemento.classList.add(
                 "today"
@@ -1747,9 +1786,7 @@ async function borrarHistorial() {
 
 
     if (!confirmar) {
-
         return;
-
     }
 
 
@@ -1777,8 +1814,7 @@ async function borrarHistorial() {
 
                 {
 
-                    method:
-                        "DELETE",
+                    method: "DELETE",
 
                     headers: {
 
@@ -1897,6 +1933,12 @@ window.actualizarCalendario =
 
 window.mesAnterior =
     mesAnterior;
+
+window.mesSiguiente =
+    mesSiguiente;
+
+window.actualizarUsuarioConectado =
+    actualizarUsuarioConectado;
 
 window.mesSiguiente =
     mesSiguiente;
