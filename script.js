@@ -19,7 +19,7 @@ async function obtenerHistorial() {
     try {
 
         const respuesta = await fetch(
-            `${SUPABASE_URL}/rest/v1/operaciones?select=*&order=Fecha.desc,Id.desc`,
+            `${SUPABASE_URL}/rest/v1/operaciones?select=*&order=Fecha.desc`,
             {
                 method: "GET",
                 headers: headers
