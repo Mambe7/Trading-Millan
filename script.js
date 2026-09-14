@@ -12,47 +12,45 @@ const SUPABASE_URL = "https://pemasiezuewkboeuudys.supabase.co";
 
 const SUPABASE_KEY = "sb_publishable_DveagRUAISleOisJ0B9TjA_fXXSyWJs";
 
+// CAPITAL INICIAL
 const CAPITAL_INICIAL = 540;
 
-
-// ==========================================
 // VARIABLES GLOBALES
-// ==========================================
-
 let registros = [];
-
 let capitalChart = null;
-
 let fechaCalendario = new Date();
 
 
 // ==========================================
-// INICIAR SISTEMA
+// INICIO
 // ==========================================
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
 
-    mostrarFecha();
+        mostrarFecha();
 
-    cargarDatos();
+        cargarDatos();
 
-});
+    }
+);
 
 
 // ==========================================
-// FECHA ACTUAL
+// MOSTRAR FECHA
 // ==========================================
 
 function mostrarFecha() {
 
-    const elementoFecha =
-        document.getElementById("fecha");
+    const elemento =
+        document.getElementById("fechaActual");
 
-    if (!elementoFecha) return;
+    if (!elemento) return;
 
     const ahora = new Date();
 
-    elementoFecha.textContent =
+    elemento.textContent =
         ahora.toLocaleDateString(
             "es-CO",
             {
@@ -61,36 +59,36 @@ function mostrarFecha() {
                 month: "long",
                 day: "numeric"
             }
-        );
+        ).toUpperCase();
+
 }
 
 
 // ==========================================
-// CARGAR DATOS DE SUPABASE
+// CARGAR DATOS DESDE SUPABASE
 // ==========================================
 
 async function cargarDatos() {
 
     try {
 
-        const respuesta = await fetch(
-            `${SUPABASE_URL}/rest/v1/operaciones?select=*&order=Fecha.asc`,
-            {
-                method: "GET",
+        const respuesta =
+            await fetch(
+                `${SUPABASE_URL}/rest/v1/operaciones?select=*&order=Fecha.asc`,
+                {
+                    method: "GET",
 
-                headers: {
+                    headers: {
 
-                    "apikey": SUPABASE_KEY,
+                        "apikey":
+                            SUPABASE_KEY,
 
-                    "Authorization":
-                        `Bearer ${SUPABASE_KEY}`,
+                        "Authorization":
+                            `Bearer ${SUPABASE_KEY}`
 
-                    "Content-Type":
-                        "application/json"
-
+                    }
                 }
-            }
-        );
+            );
 
 
         if (!respuesta.ok) {
@@ -113,12 +111,10 @@ async function cargarDatos() {
 
 
         console.log(
-            "REGISTROS CARGADOS:",
+            "Registros cargados:",
             registros
         );
 
-
-        // Actualizar toda la interfaz
 
         actualizarPanel();
 
@@ -147,32 +143,50 @@ async function cargarDatos() {
 
 async function registrarResultado() {
 
-    const campoGanancia =
+    const resultadoInput =
         document.getElementById(
-            "ganancia"
+            "resultadoInput"
         );
 
-    const campoOperaciones =
+    const operacionesInput =
         document.getElementById(
-            "numeroOperaciones"
+            "operacionesInput"
         );
+
+
+    if (
+        !resultadoInput ||
+        !operacionesInput
+    ) {
+
+        alert(
+            "No se encontraron los campos de registro."
+        );
+
+        return;
+
+    }
 
 
     const resultado =
-        parseFloat(
-            campoGanancia.value
+        Number(
+            resultadoInput.value
         );
+
 
     const operaciones =
-        parseInt(
-            campoOperaciones.value
+        Number(
+            operacionesInput.value
         );
 
 
-    if (isNaN(resultado)) {
+    if (
+        isNaN(resultado) ||
+        isNaN(operaciones)
+    ) {
 
         alert(
-            "Ingresa el resultado del día."
+            "Ingresa datos válidos."
         );
 
         return;
@@ -180,10 +194,12 @@ async function registrarResultado() {
     }
 
 
-    if (isNaN(operaciones)) {
+    if (
+        operaciones <= 0
+    ) {
 
         alert(
-            "Ingresa el número de operaciones."
+            "La cantidad de operaciones debe ser mayor que 0."
         );
 
         return;
@@ -191,18 +207,25 @@ async function registrarResultado() {
     }
 
 
-    let nombreUsuario =
+    const usuario =
         prompt(
-            "¿Quién está registrando el resultado?\n\n1 = Juan Millan Grisales\n2 = Edilberto Millan"
+            "¿Quién está registrando?\n\n1 = Juan Millan Grisales\n2 = Edilberto Millan"
         );
 
 
-    if (nombreUsuario === "1") {
+    let nombreUsuario = "";
+
+
+    if (
+        usuario === "1"
+    ) {
 
         nombreUsuario =
             "JUAN MILLAN GRISALES";
 
-    } else if (nombreUsuario === "2") {
+    } else if (
+        usuario === "2"
+    ) {
 
         nombreUsuario =
             "EDILBERTO MILLAN";
@@ -222,29 +245,47 @@ async function registrarResultado() {
         new Date();
 
 
+    const año =
+        ahora.getFullYear();
+
+
+    const mes =
+        String(
+            ahora.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        );
+
+
+    const dia =
+        String(
+            ahora.getDate()
+        ).padStart(
+            2,
+            "0"
+        );
+
+
     const hoy =
-        ahora
-            .toISOString()
-            .split("T")[0];
+        `${año}-${mes}-${dia}`;
 
 
     const nuevoRegistro = {
 
-        Fecha: hoy,
+        Fecha:
+            hoy,
 
-        Resultado: resultado,
+        Resultado:
+            resultado,
 
-        Operaciones: operaciones,
+        Operaciones:
+            operaciones,
 
-        Usuario: nombreUsuario
+        Usuario:
+            nombreUsuario
 
     };
-
-
-    console.log(
-        "REGISTRO QUE SE ENVIARÁ:",
-        nuevoRegistro
-    );
 
 
     try {
@@ -254,7 +295,8 @@ async function registrarResultado() {
                 `${SUPABASE_URL}/rest/v1/operaciones`,
                 {
 
-                    method: "POST",
+                    method:
+                        "POST",
 
                     headers: {
 
@@ -268,7 +310,7 @@ async function registrarResultado() {
                             "application/json",
 
                         "Prefer":
-                            "return=representation"
+                            "return=minimal"
 
                     },
 
@@ -287,12 +329,12 @@ async function registrarResultado() {
                 await respuesta.text();
 
             console.error(
-                "ERROR AL GUARDAR:",
+                "ERROR AL REGISTRAR:",
                 error
             );
 
             alert(
-                "No se pudo guardar el resultado."
+                "No se pudo registrar el resultado."
             );
 
             return;
@@ -300,24 +342,16 @@ async function registrarResultado() {
         }
 
 
-        const datosGuardados =
-            await respuesta.json();
-
-
-        console.log(
-            "REGISTRO GUARDADO:",
-            datosGuardados
-        );
-
-
         alert(
             "Resultado registrado correctamente."
         );
 
 
-        campoGanancia.value = "";
+        resultadoInput.value =
+            "";
 
-        campoOperaciones.value = "";
+        operacionesInput.value =
+            "";
 
 
         await cargarDatos();
@@ -380,10 +414,22 @@ function actualizarPanel() {
         ) * 100;
 
 
+    const ahora =
+        new Date();
+
+
     const hoy =
-        new Date()
-            .toISOString()
-            .split("T")[0];
+        `${ahora.getFullYear()}-${String(
+            ahora.getMonth() + 1
+        ).padStart(
+            2,
+            "0"
+        )}-${String(
+            ahora.getDate()
+        ).padStart(
+            2,
+            "0"
+        )}`;
 
 
     let resultadoHoy = 0;
@@ -415,47 +461,95 @@ function actualizarPanel() {
     );
 
 
-    document.getElementById(
-        "capital"
-    ).textContent =
-        formatearDinero(
-            capitalActual
+    const capital =
+        document.getElementById(
+            "capital"
         );
 
 
-    document.getElementById(
-        "resultado"
-    ).textContent =
-        formatearDinero(
-            resultadoHoy
+    if (capital) {
+
+        capital.textContent =
+            formatearDinero(
+                capitalActual
+            );
+
+    }
+
+
+    const resultado =
+        document.getElementById(
+            "resultado"
         );
 
 
-    document.getElementById(
-        "operaciones"
-    ).textContent =
-        operacionesHoy;
+    if (resultado) {
+
+        resultado.textContent =
+            formatearDinero(
+                resultadoHoy
+            );
+
+    }
 
 
-    document.getElementById(
-        "rentabilidad"
-    ).textContent =
-        rentabilidad.toFixed(2) +
-        "%";
-
-
-    document.getElementById(
-        "gananciaTotal"
-    ).textContent =
-        formatearDinero(
-            gananciaTotal
+    const operaciones =
+        document.getElementById(
+            "operaciones"
         );
 
 
-    document.getElementById(
-        "totalOperaciones"
-    ).textContent =
-        operacionesTotales;
+    if (operaciones) {
+
+        operaciones.textContent =
+            operacionesHoy;
+
+    }
+
+
+    const rentabilidadElemento =
+        document.getElementById(
+            "rentabilidad"
+        );
+
+
+    if (rentabilidadElemento) {
+
+        rentabilidadElemento.textContent =
+            rentabilidad.toFixed(2) +
+            "%";
+
+    }
+
+
+    const gananciaTotalElemento =
+        document.getElementById(
+            "gananciaTotal"
+        );
+
+
+    if (gananciaTotalElemento) {
+
+        gananciaTotalElemento.textContent =
+            formatearDinero(
+                gananciaTotal
+            );
+
+    }
+
+
+    const totalOperaciones =
+        document.getElementById(
+            "totalOperaciones"
+        );
+
+
+    if (totalOperaciones) {
+
+        totalOperaciones.textContent =
+            operacionesTotales;
+
+    }
 
 
     const diasUnicos =
@@ -467,10 +561,18 @@ function actualizarPanel() {
         );
 
 
-    document.getElementById(
-        "diasRegistrados"
-    ).textContent =
-        diasUnicos.size;
+    const diasRegistrados =
+        document.getElementById(
+            "diasRegistrados"
+        );
+
+
+    if (diasRegistrados) {
+
+        diasRegistrados.textContent =
+            diasUnicos.size;
+
+    }
 
 
     const resultadoTexto =
@@ -482,12 +584,16 @@ function actualizarPanel() {
     if (!resultadoTexto) return;
 
 
-    if (resultadoHoy > 0) {
+    if (
+        resultadoHoy > 0
+    ) {
 
         resultadoTexto.textContent =
             "Día positivo 📈";
 
-    } else if (resultadoHoy < 0) {
+    } else if (
+        resultadoHoy < 0
+    ) {
 
         resultadoTexto.textContent =
             "Día negativo 📉";
@@ -517,7 +623,8 @@ function actualizarHistorial() {
     if (!historial) return;
 
 
-    historial.innerHTML = "";
+    historial.innerHTML =
+        "";
 
 
     let capital =
@@ -616,6 +723,7 @@ function actualizarGrafica() {
         "Inicio"
     );
 
+
     capitales.push(
         capital
     );
@@ -652,7 +760,10 @@ function actualizarGrafica() {
     }
 
 
-    if (typeof Chart === "undefined") {
+    if (
+        typeof Chart ===
+        "undefined"
+    ) {
 
         console.error(
             "Chart.js no está cargado."
@@ -668,11 +779,13 @@ function actualizarGrafica() {
             canvas,
             {
 
-                type: "line",
+                type:
+                    "line",
 
                 data: {
 
-                    labels: fechas,
+                    labels:
+                        fechas,
 
                     datasets: [
 
@@ -734,10 +847,14 @@ function actualizarGrafica() {
                             ticks: {
 
                                 callback:
-                                    function(value) {
+                                    function (
+                                        value
+                                    ) {
 
-                                        return "$" +
-                                            value;
+                                        return (
+                                            "$" +
+                                            value
+                                        );
 
                                     }
 
@@ -773,7 +890,10 @@ function actualizarCalendario() {
         );
 
 
-    if (!contenedor || !titulo) {
+    if (
+        !contenedor ||
+        !titulo
+    ) {
 
         console.warn(
             "No se encontraron los elementos del calendario."
@@ -784,9 +904,8 @@ function actualizarCalendario() {
     }
 
 
-    // Limpiar calendario
-
-    contenedor.innerHTML = "";
+    contenedor.innerHTML =
+        "";
 
 
     const año =
@@ -797,14 +916,16 @@ function actualizarCalendario() {
         fechaCalendario.getMonth();
 
 
-    // Nombre del mes
-
     const nombreMes =
         fechaCalendario.toLocaleDateString(
             "es-CO",
             {
-                month: "long",
-                year: "numeric"
+                month:
+                    "long",
+
+                year:
+                    "numeric"
+
             }
         );
 
@@ -814,7 +935,7 @@ function actualizarCalendario() {
 
 
     // ======================================
-    // PRIMER DÍA DEL MES
+    // PRIMER DÍA
     // ======================================
 
     let primerDia =
@@ -825,16 +946,15 @@ function actualizarCalendario() {
         ).getDay();
 
 
-    // JavaScript:
     // Domingo = 0
     // Lunes = 1
-    // ...
-    //
-    // Nuestro calendario empieza en LUNES
 
-    if (primerDia === 0) {
+    if (
+        primerDia === 0
+    ) {
 
-        primerDia = 6;
+        primerDia =
+            6;
 
     } else {
 
@@ -845,7 +965,7 @@ function actualizarCalendario() {
 
 
     // ======================================
-    // CANTIDAD DE DIAS
+    // CANTIDAD DE DÍAS
     // ======================================
 
     const cantidadDias =
@@ -857,7 +977,7 @@ function actualizarCalendario() {
 
 
     // ======================================
-    // ESPACIOS ANTES DEL DIA 1
+    // ESPACIOS ANTES DEL DÍA 1
     // ======================================
 
     for (
@@ -884,7 +1004,7 @@ function actualizarCalendario() {
 
 
     // ======================================
-    // CREAR TODOS LOS DIAS
+    // CREAR DÍAS
     // ======================================
 
     for (
@@ -903,9 +1023,7 @@ function actualizarCalendario() {
             "calendar-day";
 
 
-        // ==================================
-        // NUMERO DEL DIA
-        // ==================================
+        // NÚMERO DEL DÍA
 
         const numero =
             document.createElement(
@@ -926,9 +1044,7 @@ function actualizarCalendario() {
         );
 
 
-        // ==================================
-        // FECHA COMPLETA
-        // ==================================
+        // FECHA
 
         const fecha =
             `${año}-${String(
@@ -944,24 +1060,27 @@ function actualizarCalendario() {
             )}`;
 
 
-        // ==================================
-        // BUSCAR OPERACIONES DEL DIA
-        // ==================================
+        // BUSCAR REGISTROS
 
         const registrosDia =
             registros.filter(
                 registro =>
-                    registro.Fecha === fecha
+                    registro.Fecha ===
+                    fecha
             );
 
 
         if (
-            registrosDia.length > 0
+            registrosDia.length >
+            0
         ) {
 
-            let resultado = 0;
+            let resultado =
+                0;
 
-            let cantidadOperaciones = 0;
+
+            let cantidadOperaciones =
+                0;
 
 
             registrosDia.forEach(
@@ -982,9 +1101,7 @@ function actualizarCalendario() {
             );
 
 
-            // ==============================
-            // MOSTRAR RESULTADO
-            // ==============================
+            // RESULTADO
 
             const resultadoElemento =
                 document.createElement(
@@ -1007,17 +1124,13 @@ function actualizarCalendario() {
             );
 
 
-            // ==============================
-            // INFORMACIÓN AL PASAR EL MOUSE
-            // ==============================
+            // OPERACIONES
 
             elemento.title =
                 `${cantidadOperaciones} operaciones`;
 
 
-            // ==============================
-            // COLOR GANANCIA / PERDIDA
-            // ==============================
+            // GANANCIA / PÉRDIDA
 
             if (
                 resultado > 0
@@ -1041,7 +1154,7 @@ function actualizarCalendario() {
 
 
         // ==================================
-        // MARCAR DIA ACTUAL
+        // MARCAR HOY
         // ==================================
 
         const ahora =
@@ -1072,10 +1185,6 @@ function actualizarCalendario() {
 
         }
 
-
-        // ==================================
-        // AGREGAR DIA AL CALENDARIO
-        // ==================================
 
         contenedor.appendChild(
             elemento
@@ -1140,7 +1249,8 @@ async function borrarHistorial() {
                 `${SUPABASE_URL}/rest/v1/operaciones?id=not.is.null`,
                 {
 
-                    method: "DELETE",
+                    method:
+                        "DELETE",
 
                     headers: {
 
@@ -1161,14 +1271,17 @@ async function borrarHistorial() {
             const error =
                 await respuesta.text();
 
+
             console.error(
                 "ERROR AL BORRAR:",
                 error
             );
 
+
             alert(
                 "No se pudo borrar el historial."
             );
+
 
             return;
 
@@ -1196,7 +1309,7 @@ async function borrarHistorial() {
 
 
 // ==========================================
-// FUNCIONES AUXILIARES
+// FORMATEAR DINERO
 // ==========================================
 
 function formatearDinero(valor) {
@@ -1205,7 +1318,9 @@ function formatearDinero(valor) {
         Number(valor) || 0;
 
 
-    if (numero >= 0) {
+    if (
+        numero >= 0
+    ) {
 
         return (
             "+$" +
@@ -1266,4 +1381,25 @@ setInterval(
     cargarDatos,
     5000
 );
+
+
+// ==========================================
+// HACER FUNCIONES DISPONIBLES
+// PARA LOS BOTONES DEL HTML
+// ==========================================
+
+window.actualizarCalendario =
+    actualizarCalendario;
+
+window.mesAnterior =
+    mesAnterior;
+
+window.mesSiguiente =
+    mesSiguiente;
+
+window.registrarResultado =
+    registrarResultado;
+
+window.borrarHistorial =
+    borrarHistorial;
 
