@@ -11,7 +11,7 @@ const headers = {
 
 
 // ===============================
-// CONEXIÓN CON SUPABASE
+// OBTENER HISTORIAL
 // ===============================
 
 async function obtenerHistorial() {
@@ -19,7 +19,7 @@ async function obtenerHistorial() {
     try {
 
         const respuesta = await fetch(
-            `${SUPABASE_URL}/rest/v1/operaciones?select=*&order=fecha.desc,id.desc`,
+            `${SUPABASE_URL}/rest/v1/operaciones?select=*&order=Fecha.desc,id.desc`,
             {
                 method: "GET",
                 headers: headers
@@ -27,6 +27,11 @@ async function obtenerHistorial() {
         );
 
         if (!respuesta.ok) {
+
+            const error = await respuesta.text();
+
+            console.error("Error Supabase:", error);
+
             throw new Error("No se pudo obtener el historial");
         }
 
@@ -39,26 +44,24 @@ async function obtenerHistorial() {
         alert("No se pudo conectar con la base de datos.");
 
         return [];
-
     }
-
 }
 
 
 // ===============================
-// CAPITAL
+// CALCULAR CAPITAL
 // ===============================
 
 function calcularCapital(historial) {
 
     const resultadoTotal = historial.reduce(
-        (total, registro) =>
-            total + Number(registro.resultado),
+        (total, registro) => {
+            return total + Number(registro.resultado);
+        },
         0
     );
 
     return CAPITAL_INICIAL + resultadoTotal;
-
 }
 
 
@@ -71,11 +74,12 @@ function formatoDinero(numero) {
     numero = Number(numero);
 
     if (numero >= 0) {
+
         return "+$" + numero.toFixed(2);
+
     }
 
     return "-$" + Math.abs(numero).toFixed(2);
-
 }
 
 
@@ -104,7 +108,6 @@ async function registrarResultado() {
         alert("Ingresa el resultado del día.");
 
         return;
-
     }
 
 
@@ -113,7 +116,6 @@ async function registrarResultado() {
         alert("Ingresa un número válido de operaciones.");
 
         return;
-
     }
 
 
@@ -139,7 +141,6 @@ async function registrarResultado() {
         alert("Usuario no válido.");
 
         return;
-
     }
 
 
@@ -151,14 +152,13 @@ async function registrarResultado() {
 
     const nuevoRegistro = {
 
-        fecha: hoy,
+        Fecha: hoy,
 
         resultado: resultado,
 
         operaciones: operaciones,
 
         usuario: nombreUsuario
-
     };
 
 
@@ -175,7 +175,6 @@ async function registrarResultado() {
                 },
 
                 body: JSON.stringify(nuevoRegistro)
-
             }
         );
 
@@ -185,14 +184,16 @@ async function registrarResultado() {
             const error =
                 await respuesta.text();
 
-            console.error(error);
+            console.error(
+                "Error al guardar:",
+                error
+            );
 
             alert(
                 "No se pudo guardar el resultado."
             );
 
             return;
-
         }
 
 
@@ -201,7 +202,10 @@ async function registrarResultado() {
         operacionesInput.value = "";
 
 
-        alert("Resultado registrado correctamente.");
+        alert(
+            "Resultado registrado correctamente."
+        );
+
 
         actualizarPantalla();
 
@@ -213,9 +217,7 @@ async function registrarResultado() {
         alert(
             "Error de conexión con Supabase."
         );
-
     }
-
 }
 
 
@@ -235,16 +237,18 @@ async function actualizarPantalla() {
 
     const resultadoTotal =
         historial.reduce(
-            (total, registro) =>
-                total + Number(registro.resultado),
+            (total, registro) => {
+                return total + Number(registro.resultado);
+            },
             0
         );
 
 
     const operacionesTotales =
         historial.reduce(
-            (total, registro) =>
-                total + Number(registro.operaciones),
+            (total, registro) => {
+                return total + Number(registro.operaciones);
+            },
             0
         );
 
@@ -284,7 +288,6 @@ async function actualizarPantalla() {
     mostrarResultadoHoy(historial);
 
     mostrarHistorial(historial);
-
 }
 
 
@@ -302,23 +305,26 @@ function mostrarResultadoHoy(historial) {
 
     const registrosHoy =
         historial.filter(
-            registro =>
-                registro.fecha === hoy
+            registro => {
+                return registro.Fecha === hoy;
+            }
         );
 
 
     const resultadoHoy =
         registrosHoy.reduce(
-            (total, registro) =>
-                total + Number(registro.resultado),
+            (total, registro) => {
+                return total + Number(registro.resultado);
+            },
             0
         );
 
 
     const operacionesHoy =
         registrosHoy.reduce(
-            (total, registro) =>
-                total + Number(registro.operaciones),
+            (total, registro) => {
+                return total + Number(registro.operaciones);
+            },
             0
         );
 
@@ -370,9 +376,7 @@ function mostrarResultadoHoy(historial) {
             "Sin resultado";
 
         texto.className = "";
-
     }
-
 }
 
 
@@ -389,7 +393,8 @@ function mostrarHistorial(historial) {
     tabla.innerHTML = "";
 
 
-    let capital = CAPITAL_INICIAL;
+    let capital =
+        CAPITAL_INICIAL;
 
 
     const registros =
@@ -398,7 +403,8 @@ function mostrarHistorial(historial) {
 
     registros.forEach(registro => {
 
-        capital += Number(registro.resultado);
+        capital +=
+            Number(registro.resultado);
 
 
         const fila =
@@ -413,7 +419,7 @@ function mostrarHistorial(historial) {
 
         const fecha =
             new Date(
-                registro.fecha + "T00:00:00"
+                registro.Fecha + "T00:00:00"
             ).toLocaleDateString("es-CO");
 
 
@@ -441,7 +447,6 @@ function mostrarHistorial(historial) {
         tabla.appendChild(fila);
 
     });
-
 }
 
 
@@ -458,31 +463,44 @@ async function borrarHistorial() {
 
 
     if (!confirmar) {
+
         return;
     }
 
 
     try {
 
-        const respuesta = await fetch(
-            `${SUPABASE_URL}/rest/v1/operaciones?id=not.is.null`,
-            {
-                method: "DELETE",
-
-                headers: headers
-            }
-        );
+        const respuesta =
+            await fetch(
+                `${SUPABASE_URL}/rest/v1/operaciones?id=not.is.null`,
+                {
+                    method: "DELETE",
+                    headers: headers
+                }
+            );
 
 
         if (!respuesta.ok) {
+
+            const error =
+                await respuesta.text();
+
+            console.error(
+                "Error al borrar:",
+                error
+            );
 
             alert(
                 "No se pudo borrar el historial."
             );
 
             return;
-
         }
+
+
+        alert(
+            "Historial borrado correctamente."
+        );
 
 
         actualizarPantalla();
@@ -495,14 +513,12 @@ async function borrarHistorial() {
         alert(
             "Error de conexión."
         );
-
     }
-
 }
 
 
 // ===============================
-// FECHA
+// MOSTRAR FECHA
 // ===============================
 
 function mostrarFecha() {
@@ -523,12 +539,11 @@ function mostrarFecha() {
             }
         )
         .toUpperCase();
-
 }
 
 
 // ===============================
-// ACTUALIZACIÓN AUTOMÁTICA
+// INICIAR APP
 // ===============================
 
 mostrarFecha();
@@ -536,9 +551,9 @@ mostrarFecha();
 actualizarPantalla();
 
 
-// Actualiza los datos cada 5 segundos
-// mientras terminamos de configurar
-// la sincronización en tiempo real.
+// ===============================
+// ACTUALIZAR CADA 5 SEGUNDOS
+// ===============================
 
 setInterval(
     actualizarPantalla,
