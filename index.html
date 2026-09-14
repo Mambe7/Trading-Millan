@@ -1,59 +1,227 @@
 <!DOCTYPE html>
+
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#050505">
 
-    <title>MILLAN TRADING</title>
+```
+<meta charset="UTF-8">
 
-    <link rel="stylesheet" href="style.css">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<meta
+    name="theme-color"
+    content="#050505"
+>
+
+<title>MILLAN TRADING</title>
+
+<link
+    rel="stylesheet"
+    href="style.css"
+>
+
+<!-- Chart.js -->
+<script
+    src="https://cdn.jsdelivr.net/npm/chart.js"
+></script>
+```
+
 </head>
 
 <body>
 
+```
+<!-- ======================================
+     PANTALLA DE LOGIN
+======================================= -->
+
+<div
+    id="loginScreen"
+    class="login-screen"
+>
+
+    <div class="login-box">
+
+        <div class="login-logo">
+
+            <h1>
+                ⚡ MILLAN TRADING
+            </h1>
+
+            <span>
+                SISTEMA DE TRADING
+            </span>
+
+        </div>
+
+
+        <div class="login-line"></div>
+
+
+        <p class="login-title">
+            ACCESO AL SISTEMA
+        </p>
+
+
+        <div class="input-box">
+
+            <label for="loginEmail">
+                CORREO ELECTRÓNICO
+            </label>
+
+            <input
+                type="email"
+                id="loginEmail"
+                placeholder="Ingresa tu correo"
+                autocomplete="email"
+            >
+
+        </div>
+
+
+        <div class="input-box">
+
+            <label for="loginPassword">
+                CONTRASEÑA
+            </label>
+
+            <input
+                type="password"
+                id="loginPassword"
+                placeholder="Ingresa tu contraseña"
+                autocomplete="current-password"
+            >
+
+        </div>
+
+
+        <button
+            type="button"
+            onclick="iniciarSesion()"
+        >
+            ⚡ ENTRAR
+        </button>
+
+
+        <p
+            id="loginMessage"
+            class="login-message"
+        ></p>
+
+
+        <div class="login-status">
+
+            <span class="dot"></span>
+
+            SISTEMA SEGURO
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================
+     APLICACIÓN PRINCIPAL
+======================================= -->
+
+<div
+    id="app"
+    style="display: none;"
+>
+
     <div class="grid-background"></div>
+
+
+    <!-- ==================================
+         HEADER
+    =================================== -->
 
     <header class="topbar">
 
         <div>
-            <h1>⚡ MILLAN TRADING</h1>
+
+            <h1>
+                ⚡ MILLAN TRADING
+            </h1>
+
 
             <span class="status">
+
                 <span class="dot"></span>
+
                 SISTEMA ONLINE
+
             </span>
+
         </div>
+
 
         <div class="users">
 
             <div>
-                <strong>JUAN MILLAN GRISALES</strong>
-                <small>TRADER</small>
+
+                <strong>
+                    JUAN MILLAN GRISALES
+                </strong>
+
+                <small>
+                    TRADER
+                </small>
+
             </div>
 
+
             <div>
-                <strong>EDILBERTO MILLAN</strong>
-                <small>TRADER</small>
+
+                <strong>
+                    EDILBERTO MILLAN
+                </strong>
+
+                <small>
+                    TRADER
+                </small>
+
             </div>
+
+
+            <button
+                class="secondary logout-button"
+                onclick="cerrarSesion()"
+            >
+                CERRAR SESIÓN
+            </button>
 
         </div>
 
     </header>
 
 
+    <!-- ==================================
+         CONTENIDO
+    =================================== -->
+
     <main class="container">
+
 
         <!-- BIENVENIDA -->
 
         <section class="welcome">
 
-            <p>/// TRADING CONTROL SYSTEM</p>
+            <p>
+                /// TRADING CONTROL SYSTEM
+            </p>
 
-            <h2>Panel de control</h2>
+
+            <h2>
+                Panel de control
+            </h2>
+
 
             <span id="fecha"></span>
 
@@ -64,22 +232,37 @@
 
         <section class="cards">
 
+
             <div class="card capital">
 
-                <span>CAPITAL ACTUAL</span>
+                <span>
+                    CAPITAL ACTUAL
+                </span>
 
-                <h3 id="capital">$540.00</h3>
 
-                <small>USD</small>
+                <h3 id="capital">
+                    $540.00
+                </h3>
+
+
+                <small>
+                    USD
+                </small>
 
             </div>
 
 
             <div class="card">
 
-                <span>RESULTADO DE HOY</span>
+                <span>
+                    RESULTADO DE HOY
+                </span>
 
-                <h3 id="resultado">$0.00</h3>
+
+                <h3 id="resultado">
+                    $0.00
+                </h3>
+
 
                 <small id="resultadoTexto">
                     Sin operaciones
@@ -90,26 +273,41 @@
 
             <div class="card">
 
-                <span>OPERACIONES</span>
+                <span>
+                    OPERACIONES
+                </span>
 
-                <h3 id="operaciones">0</h3>
 
-                <small>Hoy</small>
+                <h3 id="operaciones">
+                    0
+                </h3>
+
+
+                <small>
+                    Hoy
+                </small>
 
             </div>
 
 
             <div class="card">
 
-                <span>RENTABILIDAD</span>
+                <span>
+                    RENTABILIDAD
+                </span>
 
-                <h3 id="rentabilidad">0.00%</h3>
+
+                <h3 id="rentabilidad">
+                    0.00%
+                </h3>
+
 
                 <small>
                     Sobre capital inicial
                 </small>
 
             </div>
+
 
         </section>
 
@@ -122,7 +320,10 @@
 
                 <div>
 
-                    <p>/// PERFORMANCE</p>
+                    <p>
+                        /// PERFORMANCE
+                    </p>
+
 
                     <h2>
                         Crecimiento del capital
@@ -135,7 +336,9 @@
 
             <div class="chart-container">
 
-                <canvas id="capitalChart"></canvas>
+                <canvas
+                    id="capitalChart"
+                ></canvas>
 
             </div>
 
@@ -150,7 +353,10 @@
 
                 <div>
 
-                    <p>/// REGISTRO</p>
+                    <p>
+                        /// REGISTRO
+                    </p>
+
 
                     <h2>
                         Registrar resultado diario
@@ -162,6 +368,7 @@
 
 
             <div class="form">
+
 
                 <div class="input-box">
 
@@ -179,8 +386,8 @@
 
 
                     <small>
-                        Usa números positivos para ganancias
-                        y negativos para pérdidas.
+                        Usa números positivos para
+                        ganancias y negativos para pérdidas.
                     </small>
 
                 </div>
@@ -203,7 +410,9 @@
                 </div>
 
 
-                <button onclick="registrarResultado()">
+                <button
+                    onclick="registrarResultado()"
+                >
                     + REGISTRAR OPERACIÓN
                 </button>
 
@@ -220,7 +429,10 @@
 
                 <div>
 
-                    <p>/// HISTORIAL</p>
+                    <p>
+                        /// HISTORIAL
+                    </p>
+
 
                     <h2>
                         Actividad reciente
@@ -247,206 +459,10 @@
 
                         <tr>
 
-                            <th>FECHA</th>
-                            <th>RESULTADO</th>
-                            <th>OPERACIONES</th>
-                            <th>CAPITAL</th>
+                            <th>
+                                FECHA
+                            </th>
 
-                        </tr>
+                            <th>
+```
 
-                    </thead>
-
-
-                    <tbody id="historial">
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </section>
-
-
-        <!-- CALENDARIO -->
-
-        <section class="panel">
-
-            <div class="panel-header">
-
-                <div>
-
-                    <p>/// CALENDARIO</p>
-
-                    <h2>
-                        Resultados diarios
-                    </h2>
-
-                </div>
-
-            </div>
-
-
-            <div class="calendar">
-
-                <div class="calendar-header">
-
-                    <button onclick="mesAnterior()">
-                        ◀
-                    </button>
-
-
-                    <h3 id="mesActual">
-                        SEPTIEMBRE 2026
-                    </h3>
-
-
-                    <button onclick="mesSiguiente()">
-                        ▶
-                    </button>
-
-                </div>
-
-
-                <div class="calendar-weekdays">
-
-                    <span>LUN</span>
-                    <span>MAR</span>
-                    <span>MIÉ</span>
-                    <span>JUE</span>
-                    <span>VIE</span>
-                    <span>SÁB</span>
-                    <span>DOM</span>
-
-                </div>
-
-
-                <div
-                    id="calendarioDias"
-                    class="calendar-days">
-                </div>
-
-
-                <div class="calendar-legend">
-
-                    <span>
-
-                        <i class="legend-positive"></i>
-
-                        Ganancia
-
-                    </span>
-
-
-                    <span>
-
-                        <i class="legend-negative"></i>
-
-                        Pérdida
-
-                    </span>
-
-
-                    <span>
-
-                        <i class="legend-neutral"></i>
-
-                        Sin operación
-
-                    </span>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ESTADÍSTICAS -->
-
-        <section class="panel statistics">
-
-            <p>/// ESTADÍSTICAS</p>
-
-
-            <div class="stats-grid">
-
-                <div>
-
-                    <span>
-                        CAPITAL INICIAL
-                    </span>
-
-                    <strong>
-                        $540.00
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <span>
-                        GANANCIA TOTAL
-                    </span>
-
-                    <strong id="gananciaTotal">
-                        $0.00
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <span>
-                        TOTAL OPERACIONES
-                    </span>
-
-                    <strong id="totalOperaciones">
-                        0
-                    </strong>
-
-                </div>
-
-
-                <div>
-
-                    <span>
-                        DÍAS REGISTRADOS
-                    </span>
-
-                    <strong id="diasRegistrados">
-                        0
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <footer>
-
-        <span>
-            © 2026 MILLAN TRADING
-        </span>
-
-
-        <span>
-
-            SYSTEM STATUS:
-
-            <b>ONLINE</b>
-
-        </span>
-
-    </footer>
-
-
-    <script src="script.js"></script>
-
-</body>
-</html>
