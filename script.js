@@ -1,24 +1,59 @@
+const SUPABASE_URL = "https://pemasiezuewkboeuudys.supabase.co/rest/v1/";
+const SUPABASE_KEY = "sb_publishable_DveagRUAISleOisJ0B9TjA_fXXSyWJs";
+
 const CAPITAL_INICIAL = 540;
 
-let historial = JSON.parse(
-    localStorage.getItem("millanTradingHistorial")
-) || [];
+const headers = {
+    "apikey": SUPABASE_KEY,
+    "Authorization": `Bearer ${SUPABASE_KEY}`,
+    "Content-Type": "application/json"
+};
 
 
-function guardarDatos() {
+// ===============================
+// CONEXIÓN CON SUPABASE
+// ===============================
 
-    localStorage.setItem(
-        "millanTradingHistorial",
-        JSON.stringify(historial)
-    );
+async function obtenerHistorial() {
+
+    try {
+
+        const respuesta = await fetch(
+            `${SUPABASE_URL}/rest/v1/operaciones?select=*&order=fecha.desc,id.desc`,
+            {
+                method: "GET",
+                headers: headers
+            }
+        );
+
+        if (!respuesta.ok) {
+            throw new Error("No se pudo obtener el historial");
+        }
+
+        return await respuesta.json();
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("No se pudo conectar con la base de datos.");
+
+        return [];
+
+    }
 
 }
 
 
-function obtenerCapitalActual() {
+// ===============================
+// CAPITAL
+// ===============================
 
-    let resultadoTotal = historial.reduce(
-        (total, registro) => total + registro.resultado,
+function calcularCapital(historial) {
+
+    const resultadoTotal = historial.reduce(
+        (total, registro) =>
+            total + Number(registro.resultado),
         0
     );
 
@@ -27,7 +62,28 @@ function obtenerCapitalActual() {
 }
 
 
-function registrarResultado() {
+// ===============================
+// FORMATO DINERO
+// ===============================
+
+function formatoDinero(numero) {
+
+    numero = Number(numero);
+
+    if (numero >= 0) {
+        return "+$" + numero.toFixed(2);
+    }
+
+    return "-$" + Math.abs(numero).toFixed(2);
+
+}
+
+
+// ===============================
+// REGISTRAR RESULTADO
+// ===============================
+
+async function registrarResultado() {
 
     const resultadoInput =
         document.getElementById("ganancia");
@@ -61,46 +117,126 @@ function registrarResultado() {
     }
 
 
-    const fecha = new Date();
+    const usuario =
+        prompt(
+            "¿Quién está registrando el resultado?\n\n1 = Juan Millan Grisales\n2 = Edilberto Millan"
+        );
 
-    const fechaTexto =
-        fecha.toLocaleDateString("es-CO");
+
+    let nombreUsuario;
 
 
-    const registro = {
+    if (usuario === "1") {
 
-        fecha: fechaTexto,
+        nombreUsuario = "Juan Millan Grisales";
+
+    } else if (usuario === "2") {
+
+        nombreUsuario = "Edilberto Millan";
+
+    } else {
+
+        alert("Usuario no válido.");
+
+        return;
+
+    }
+
+
+    const hoy =
+        new Date()
+            .toISOString()
+            .split("T")[0];
+
+
+    const nuevoRegistro = {
+
+        fecha: hoy,
 
         resultado: resultado,
 
-        operaciones: operaciones
+        operaciones: operaciones,
+
+        usuario: nombreUsuario
 
     };
 
 
-    historial.push(registro);
+    try {
 
-    guardarDatos();
+        const respuesta = await fetch(
+            `${SUPABASE_URL}/rest/v1/operaciones`,
+            {
+                method: "POST",
 
-    resultadoInput.value = "";
+                headers: {
+                    ...headers,
+                    "Prefer": "return=representation"
+                },
 
-    operacionesInput.value = "";
+                body: JSON.stringify(nuevoRegistro)
 
-    actualizarPantalla();
+            }
+        );
+
+
+        if (!respuesta.ok) {
+
+            const error =
+                await respuesta.text();
+
+            console.error(error);
+
+            alert(
+                "No se pudo guardar el resultado."
+            );
+
+            return;
+
+        }
+
+
+        resultadoInput.value = "";
+
+        operacionesInput.value = "";
+
+
+        alert("Resultado registrado correctamente.");
+
+        actualizarPantalla();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Error de conexión con Supabase."
+        );
+
+    }
 
 }
 
 
-function actualizarPantalla() {
+// ===============================
+// ACTUALIZAR PANTALLA
+// ===============================
+
+async function actualizarPantalla() {
+
+    const historial =
+        await obtenerHistorial();
+
 
     const capitalActual =
-        obtenerCapitalActual();
+        calcularCapital(historial);
 
 
     const resultadoTotal =
         historial.reduce(
             (total, registro) =>
-                total + registro.resultado,
+                total + Number(registro.resultado),
             0
         );
 
@@ -108,14 +244,16 @@ function actualizarPantalla() {
     const operacionesTotales =
         historial.reduce(
             (total, registro) =>
-                total + registro.operaciones,
+                total + Number(registro.operaciones),
             0
         );
 
 
     const rentabilidad =
-        ((capitalActual - CAPITAL_INICIAL)
-        / CAPITAL_INICIAL) * 100;
+        (
+            (capitalActual - CAPITAL_INICIAL)
+            / CAPITAL_INICIAL
+        ) * 100;
 
 
     document.getElementById("capital")
@@ -143,29 +281,36 @@ function actualizarPantalla() {
         rentabilidad.toFixed(2) + "%";
 
 
-    mostrarResultadoHoy();
+    mostrarResultadoHoy(historial);
 
-    mostrarHistorial();
+    mostrarHistorial(historial);
 
 }
 
 
-function mostrarResultadoHoy() {
+// ===============================
+// RESULTADO DE HOY
+// ===============================
+
+function mostrarResultadoHoy(historial) {
 
     const hoy =
-        new Date().toLocaleDateString("es-CO");
+        new Date()
+            .toISOString()
+            .split("T")[0];
 
 
     const registrosHoy =
         historial.filter(
-            registro => registro.fecha === hoy
+            registro =>
+                registro.fecha === hoy
         );
 
 
     const resultadoHoy =
         registrosHoy.reduce(
             (total, registro) =>
-                total + registro.resultado,
+                total + Number(registro.resultado),
             0
         );
 
@@ -173,7 +318,7 @@ function mostrarResultadoHoy() {
     const operacionesHoy =
         registrosHoy.reduce(
             (total, registro) =>
-                total + registro.operaciones,
+                total + Number(registro.operaciones),
             0
         );
 
@@ -224,12 +369,18 @@ function mostrarResultadoHoy() {
         texto.textContent =
             "Sin resultado";
 
+        texto.className = "";
+
     }
 
 }
 
 
-function mostrarHistorial() {
+// ===============================
+// MOSTRAR HISTORIAL
+// ===============================
+
+function mostrarHistorial(historial) {
 
     const tabla =
         document.getElementById("historial");
@@ -238,94 +389,127 @@ function mostrarHistorial() {
     tabla.innerHTML = "";
 
 
-    [...historial]
-        .reverse()
-        .forEach((registro, index) => {
-
-            const fila =
-                document.createElement("tr");
+    let capital = CAPITAL_INICIAL;
 
 
-            const clase =
-                registro.resultado >= 0
-                    ? "profit"
-                    : "loss";
+    const registros =
+        [...historial].reverse();
 
 
-            const capitalHastaEseMomento =
-                historial
-                    .slice(
-                        0,
-                        historial.indexOf(registro) + 1
-                    )
-                    .reduce(
-                        (capital, item) =>
-                            capital + item.resultado,
-                        CAPITAL_INICIAL
-                    );
+    registros.forEach(registro => {
+
+        capital += Number(registro.resultado);
 
 
-            fila.innerHTML = `
-
-                <td>${registro.fecha}</td>
-
-                <td class="${clase}">
-                    ${formatoDinero(registro.resultado)}
-                </td>
-
-                <td>
-                    ${registro.operaciones}
-                </td>
-
-                <td>
-                    $${capitalHastaEseMomento.toFixed(2)}
-                </td>
-
-            `;
+        const fila =
+            document.createElement("tr");
 
 
-            tabla.appendChild(fila);
+        const clase =
+            Number(registro.resultado) >= 0
+                ? "profit"
+                : "loss";
 
-        });
+
+        const fecha =
+            new Date(
+                registro.fecha + "T00:00:00"
+            ).toLocaleDateString("es-CO");
+
+
+        fila.innerHTML = `
+
+            <td>
+                ${fecha}
+            </td>
+
+            <td class="${clase}">
+                ${formatoDinero(registro.resultado)}
+            </td>
+
+            <td>
+                ${registro.operaciones}
+            </td>
+
+            <td>
+                $${capital.toFixed(2)}
+            </td>
+
+        `;
+
+
+        tabla.appendChild(fila);
+
+    });
 
 }
 
 
-function formatoDinero(numero) {
+// ===============================
+// BORRAR HISTORIAL
+// ===============================
 
-    if (numero >= 0) {
+async function borrarHistorial() {
 
-        return "+$" + numero.toFixed(2);
+    const confirmar =
+        confirm(
+            "¿Seguro que quieres borrar TODO el historial?"
+        );
 
+
+    if (!confirmar) {
+        return;
     }
 
-    return "-$" + Math.abs(numero).toFixed(2);
 
-}
+    try {
+
+        const respuesta = await fetch(
+            `${SUPABASE_URL}/rest/v1/operaciones?id=not.is.null`,
+            {
+                method: "DELETE",
+
+                headers: headers
+            }
+        );
 
 
-function borrarHistorial() {
+        if (!respuesta.ok) {
 
-    if (
-        historial.length > 0 &&
-        confirm("¿Quieres borrar todo el historial?")
-    ) {
+            alert(
+                "No se pudo borrar el historial."
+            );
 
-        historial = [];
+            return;
 
-        guardarDatos();
+        }
+
 
         actualizarPantalla();
 
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Error de conexión."
+        );
+
     }
 
 }
 
+
+// ===============================
+// FECHA
+// ===============================
 
 function mostrarFecha() {
 
     const fecha =
         new Date();
+
 
     document.getElementById("fecha")
         .textContent =
@@ -337,11 +521,26 @@ function mostrarFecha() {
                 month: "long",
                 day: "numeric"
             }
-        ).toUpperCase();
+        )
+        .toUpperCase();
 
 }
 
 
+// ===============================
+// ACTUALIZACIÓN AUTOMÁTICA
+// ===============================
+
 mostrarFecha();
 
 actualizarPantalla();
+
+
+// Actualiza los datos cada 5 segundos
+// mientras terminamos de configurar
+// la sincronización en tiempo real.
+
+setInterval(
+    actualizarPantalla,
+    5000
+);
