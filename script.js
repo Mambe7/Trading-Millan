@@ -1,6 +1,9 @@
 const SUPABASE_URL = "https://pemasiezuewkboeuudys.supabase.co";
 const SUPABASE_KEY = "sb_publishable_DveagRUAISleOisJ0B9TjA_fXXSyWJs";
 
+const SUPABASE_URL = "https://pemasiezuewkboeuudys.supabase.co";
+const SUPABASE_KEY = "sb_publishable_DveagRUAISleOisJ0B9TjA_fXXSyWJs";
+
 const CAPITAL_INICIAL = 540;
 
 const headers = {
@@ -150,6 +153,10 @@ async function registrarResultado() {
             .split("T")[0];
 
 
+    // IMPORTANTE:
+    // Estos nombres coinciden EXACTAMENTE
+    // con las columnas de Supabase.
+
     const nuevoRegistro = {
 
         Fecha: hoy,
@@ -160,6 +167,12 @@ async function registrarResultado() {
 
         Usuario: nombreUsuario
     };
+
+
+    console.log(
+        "REGISTRO QUE SE ENVIARÁ:",
+        nuevoRegistro
+    );
 
 
     try {
@@ -195,6 +208,16 @@ async function registrarResultado() {
 
             return;
         }
+
+
+        const datosGuardados =
+            await respuesta.json();
+
+
+        console.log(
+            "REGISTRO GUARDADO:",
+            datosGuardados
+        );
 
 
         resultadoInput.value = "";
@@ -472,7 +495,7 @@ async function borrarHistorial() {
 
         const respuesta =
             await fetch(
-                `${SUPABASE_URL}/rest/v1/operaciones?Id=not.is.null`,
+                `${SUPABASE_URL}/rest/v1/operaciones?id=not.is.null`,
                 {
                     method: "DELETE",
                     headers: headers
