@@ -559,3 +559,5 @@ setInterval(
     actualizarPantalla,
     5000
 );
+
+
