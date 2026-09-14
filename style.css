@@ -24,6 +24,10 @@ body {
     background-size: 40px 40px;
 }
 
+/* ==========================================
+   BARRA SUPERIOR
+========================================== */
+
 .topbar {
     position: relative;
     z-index: 2;
@@ -87,6 +91,10 @@ body {
     font-size: 9px;
 }
 
+/* ==========================================
+   CONTENEDOR
+========================================== */
+
 .container {
     position: relative;
     z-index: 1;
@@ -118,11 +126,13 @@ body {
     font-size: 12px;
 }
 
+/* ==========================================
+   TARJETAS
+========================================== */
+
 .cards {
     display: grid;
-
-    grid-template-columns:
-        repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr);
 
     gap: 15px;
 
@@ -172,6 +182,10 @@ body {
     color: #00ff66;
 }
 
+/* ==========================================
+   PANELES
+========================================== */
+
 .panel {
     background: rgba(10,10,10,0.95);
 
@@ -195,11 +209,14 @@ body {
     font-size: 20px;
 }
 
+/* ==========================================
+   FORMULARIO
+========================================== */
+
 .form {
     display: grid;
 
-    grid-template-columns:
-        1fr 1fr auto;
+    grid-template-columns: 1fr 1fr auto;
 
     gap: 15px;
 
@@ -248,6 +265,10 @@ body {
     margin-top: 7px;
 }
 
+/* ==========================================
+   BOTONES
+========================================== */
+
 button {
     background: #00ff66;
 
@@ -285,6 +306,10 @@ button:hover {
     border-color: #ff4444;
     box-shadow: none;
 }
+
+/* ==========================================
+   TABLA
+========================================== */
 
 .table-container {
     overflow-x: auto;
@@ -338,7 +363,6 @@ td {
     margin-top: 10px;
 }
 
-
 /* ==========================================
    CALENDARIO
 ========================================== */
@@ -347,6 +371,7 @@ td {
     width: 100%;
 }
 
+/* CABECERA DEL CALENDARIO */
 
 .calendar-header {
     display: flex;
@@ -357,7 +382,6 @@ td {
 
     margin-bottom: 20px;
 }
-
 
 .calendar-header h3 {
     margin: 0;
@@ -372,7 +396,6 @@ td {
 
     text-align: center;
 }
-
 
 .calendar-header button {
     width: 42px;
@@ -394,7 +417,6 @@ td {
     padding: 0;
 }
 
-
 .calendar-header button:hover {
     background: rgba(0,255,102,0.10);
 
@@ -402,22 +424,17 @@ td {
         0 0 15px rgba(0,255,102,0.15);
 }
 
-
-.calendar-weekdays,
-.calendar-days {
-    display: grid;
-
-    grid-template-columns:
-        repeat(7, 1fr);
-
-    gap: 8px;
-}
-
+/* DIAS DE LA SEMANA */
 
 .calendar-weekdays {
+    display: grid;
+
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+
+    gap: 8px;
+
     margin-bottom: 8px;
 }
-
 
 .calendar-weekdays span {
     text-align: center;
@@ -431,11 +448,28 @@ td {
     padding: 8px 0;
 }
 
+/* CONTENEDOR DE TODOS LOS DIAS */
+
+.calendar-days {
+    display: grid;
+
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+
+    grid-auto-rows: minmax(75px, auto);
+
+    gap: 8px;
+
+    width: 100%;
+}
+
+/* CADA CUADRO */
 
 .calendar-day {
+    min-width: 0;
+
     min-height: 75px;
 
-    padding: 8px;
+    padding: 10px;
 
     border: 1px solid rgba(255,255,255,0.08);
 
@@ -446,8 +480,9 @@ td {
     position: relative;
 
     transition: 0.2s;
-}
 
+    overflow: hidden;
+}
 
 .calendar-day:hover {
     background: rgba(255,255,255,0.07);
@@ -455,13 +490,17 @@ td {
     transform: translateY(-2px);
 }
 
+/* ESPACIOS ANTES DEL DIA 1 */
 
 .calendar-day.empty {
     border: none;
 
     background: transparent;
+
+    pointer-events: none;
 }
 
+/* NUMERO DEL DIA */
 
 .calendar-number {
     color: #aaa;
@@ -471,6 +510,7 @@ td {
     font-weight: bold;
 }
 
+/* RESULTADO */
 
 .calendar-result {
     margin-top: 12px;
@@ -478,46 +518,43 @@ td {
     font-size: 11px;
 
     font-weight: bold;
+
+    white-space: nowrap;
 }
 
+/* GANANCIA */
 
 .calendar-day.positive {
-    border-color:
-        rgba(0,255,102,0.35);
+    border-color: rgba(0,255,102,0.35);
 
-    background:
-        rgba(0,255,102,0.06);
+    background: rgba(0,255,102,0.06);
 }
-
-
-.calendar-day.negative {
-    border-color:
-        rgba(255,68,68,0.35);
-
-    background:
-        rgba(255,68,68,0.06);
-}
-
 
 .calendar-day.positive .calendar-number {
     color: #00ff66;
 }
 
+.calendar-day.positive .calendar-result {
+    color: #00ff66;
+}
+
+/* PERDIDA */
+
+.calendar-day.negative {
+    border-color: rgba(255,68,68,0.35);
+
+    background: rgba(255,68,68,0.06);
+}
 
 .calendar-day.negative .calendar-number {
     color: #ff4444;
 }
 
-
-.calendar-day.positive .calendar-result {
-    color: #00ff66;
-}
-
-
 .calendar-day.negative .calendar-result {
     color: #ff4444;
 }
 
+/* DIA ACTUAL */
 
 .calendar-day.today {
     box-shadow:
@@ -525,6 +562,11 @@ td {
         0 0 12px rgba(0,255,102,0.15);
 }
 
+.calendar-day.today .calendar-number {
+    color: #00ff66;
+}
+
+/* LEYENDA */
 
 .calendar-legend {
     display: flex;
@@ -540,7 +582,6 @@ td {
     color: #777;
 }
 
-
 .calendar-legend span {
     display: flex;
 
@@ -548,7 +589,6 @@ td {
 
     gap: 7px;
 }
-
 
 .calendar-legend i {
     width: 10px;
@@ -560,14 +600,12 @@ td {
     display: inline-block;
 }
 
-
 .legend-positive {
     background: #00ff66;
 
     box-shadow:
         0 0 8px rgba(0,255,102,0.5);
 }
-
 
 .legend-negative {
     background: #ff4444;
@@ -576,14 +614,12 @@ td {
         0 0 8px rgba(255,68,68,0.4);
 }
 
-
 .legend-neutral {
     background: #555;
 }
 
-
 /* ==========================================
-   ESTADÍSTICAS
+   ESTADISTICAS
 ========================================== */
 
 .statistics {
@@ -593,8 +629,7 @@ td {
 .stats-grid {
     display: grid;
 
-    grid-template-columns:
-        repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr);
 
     gap: 15px;
 
@@ -623,6 +658,10 @@ td {
     font-size: 18px;
 }
 
+/* ==========================================
+   FOOTER
+========================================== */
+
 footer {
     position: relative;
 
@@ -643,7 +682,6 @@ footer b {
     color: #00ff66;
 }
 
-
 /* ==========================================
    TABLET
 ========================================== */
@@ -656,42 +694,41 @@ footer b {
         gap: 20px;
     }
 
-
     .users {
         flex-direction: column;
 
         gap: 8px;
     }
 
-
     .users div {
         text-align: right;
     }
 
-
     .cards {
-        grid-template-columns:
-            repeat(2, 1fr);
+        grid-template-columns: repeat(2, 1fr);
     }
-
 
     .form {
         grid-template-columns: 1fr;
     }
 
-
     .stats-grid {
-        grid-template-columns:
-            repeat(2, 1fr);
+        grid-template-columns: repeat(2, 1fr);
     }
-
 
     .chart-container {
         height: 280px;
     }
 
-}
+    .calendar-days,
+    .calendar-weekdays {
+        gap: 6px;
+    }
 
+    .calendar-day {
+        min-height: 70px;
+    }
+}
 
 /* ==========================================
    CELULAR
@@ -703,7 +740,6 @@ footer b {
         flex-direction: column;
     }
 
-
     .users {
         flex-direction: row;
 
@@ -712,11 +748,9 @@ footer b {
         justify-content: space-between;
     }
 
-
     .users div {
         text-align: left;
     }
-
 
     .container {
         width: 94%;
@@ -724,44 +758,46 @@ footer b {
         margin-top: 30px;
     }
 
-
     .cards {
         grid-template-columns: 1fr;
     }
-
 
     .panel {
         padding: 20px;
     }
 
-
     .welcome h2 {
         font-size: 23px;
     }
-
 
     .chart-container {
         height: 240px;
     }
 
+    /* CALENDARIO EN CELULAR */
 
     .calendar-weekdays,
     .calendar-days {
         gap: 4px;
     }
 
+    .calendar-weekdays span {
+        font-size: 8px;
+
+        letter-spacing: 0;
+    }
 
     .calendar-day {
         min-height: 60px;
 
-        padding: 5px;
-    }
+        padding: 6px;
 
+        border-radius: 5px;
+    }
 
     .calendar-number {
         font-size: 11px;
     }
-
 
     .calendar-result {
         font-size: 8px;
@@ -769,11 +805,9 @@ footer b {
         margin-top: 8px;
     }
 
-
     .calendar-header h3 {
         font-size: 13px;
     }
-
 
     .calendar-header button {
         width: 35px;
@@ -783,18 +817,15 @@ footer b {
         font-size: 12px;
     }
 
-
     .calendar-legend {
         gap: 10px;
 
         font-size: 9px;
     }
 
-
     footer {
         flex-direction: column;
 
         gap: 8px;
     }
-
 }
