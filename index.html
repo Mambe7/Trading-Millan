@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#050505">
+
+    <title>MILLAN TRADING</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="grid-background"></div>
+
+    <header class="topbar">
+
+        <div>
+            <h1>⚡ MILLAN TRADING</h1>
+            <span class="status">
+                <span class="dot"></span>
+                SISTEMA ONLINE
+            </span>
+        </div>
+
+        <div class="users">
+            <div>
+                <strong>JUAN MILLAN GRISALES</strong>
+                <small>TRADER</small>
+            </div>
+
+            <div>
+                <strong>EDILBERTO MILLAN</strong>
+                <small>TRADER</small>
+            </div>
+        </div>
+
+    </header>
+
+
+    <main class="container">
+
+        <section class="welcome">
+            <p>/// TRADING CONTROL SYSTEM</p>
+            <h2>Panel de control</h2>
+            <span id="fecha"></span>
+        </section>
+
+
+        <section class="cards">
+
+            <div class="card capital">
+                <span>CAPITAL ACTUAL</span>
+                <h3 id="capital">$540.00</h3>
+                <small>USD</small>
+            </div>
+
+            <div class="card">
+                <span>RESULTADO DE HOY</span>
+                <h3 id="resultado">$0.00</h3>
+                <small id="resultadoTexto">Sin operaciones</small>
+            </div>
+
+            <div class="card">
+                <span>OPERACIONES</span>
+                <h3 id="operaciones">0</h3>
+                <small>Hoy</small>
+            </div>
+
+            <div class="card">
+                <span>RENTABILIDAD</span>
+                <h3 id="rentabilidad">0.00%</h3>
+                <small>Sobre capital inicial</small>
+            </div>
+
+        </section>
+
+
+        <section class="panel">
+
+            <div class="panel-header">
+                <div>
+                    <p>/// REGISTRO</p>
+                    <h2>Registrar resultado diario</h2>
+                </div>
+            </div>
+
+            <div class="form">
+
+                <div class="input-box">
+                    <label>RESULTADO DEL DÍA</label>
+
+                    <input
+                        type="number"
+                        id="ganancia"
+                        placeholder="Ej: 15.50"
+                        step="0.01"
+                    >
+
+                    <small>
+                        Usa números positivos para ganancias y negativos para pérdidas.
+                    </small>
+                </div>
+
+
+                <div class="input-box">
+                    <label>NÚMERO DE OPERACIONES</label>
+
+                    <input
+                        type="number"
+                        id="numeroOperaciones"
+                        placeholder="Ej: 8"
+                        min="0"
+                    >
+                </div>
+
+
+                <button onclick="registrarResultado()">
+                    + REGISTRAR OPERACIÓN
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <p>/// HISTORIAL</p>
+                    <h2>Actividad reciente</h2>
+                </div>
+
+                <button class="secondary" onclick="borrarHistorial()">
+                    LIMPIAR
+                </button>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>FECHA</th>
+                            <th>RESULTADO</th>
+                            <th>OPERACIONES</th>
+                            <th>CAPITAL</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="historial">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <section class="panel statistics">
+
+            <p>/// ESTADÍSTICAS</p>
+
+            <div class="stats-grid">
+
+                <div>
+                    <span>CAPITAL INICIAL</span>
+                    <strong>$540.00</strong>
+                </div>
+
+                <div>
+                    <span>GANANCIA TOTAL</span>
+                    <strong id="gananciaTotal">$0.00</strong>
+                </div>
+
+                <div>
+                    <span>TOTAL OPERACIONES</span>
+                    <strong id="totalOperaciones">0</strong>
+                </div>
+
+                <div>
+                    <span>DÍAS REGISTRADOS</span>
+                    <strong id="diasRegistrados">0</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer>
+
+        <span>© 2026 MILLAN TRADING</span>
+
+        <span>
+            SYSTEM STATUS:
+            <b>ONLINE</b>
+        </span>
+
+    </footer>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>
