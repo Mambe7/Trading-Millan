@@ -1,213 +1,401 @@
+/* ==========================================
+   MILLAN TRADING
+   ESTILO PRINCIPAL
+========================================== */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     background: #050505;
     color: #e8e8e8;
-    font-family: "Courier New", monospace;
+    font-family: "Courier New", Courier, monospace;
     min-height: 100vh;
-}
-
-.grid-background {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.12;
-
     background-image:
-        linear-gradient(rgba(0,255,100,0.15) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,255,100,0.15) 1px, transparent 1px);
-
+        linear-gradient(rgba(0, 255, 102, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 102, 0.025) 1px, transparent 1px);
     background-size: 40px 40px;
 }
 
+
 /* ==========================================
-   BARRA SUPERIOR
+   SCROLLBAR
 ========================================== */
 
-.topbar {
-    position: relative;
-    z-index: 2;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    padding: 25px 6%;
-
-    border-bottom: 1px solid #1a1a1a;
-
-    background: rgba(5,5,5,0.95);
+::-webkit-scrollbar {
+    width: 8px;
 }
 
-.topbar h1 {
+::-webkit-scrollbar-track {
+    background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #00ff66;
+    border-radius: 10px;
+}
+
+
+/* ==========================================
+   LOGIN
+========================================== */
+
+.login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 430px;
+    background: rgba(10, 10, 10, 0.96);
+    border: 1px solid rgba(0, 255, 102, 0.35);
+    padding: 40px;
+    box-shadow:
+        0 0 30px rgba(0, 255, 102, 0.08),
+        inset 0 0 30px rgba(0, 255, 102, 0.015);
+}
+
+.login-logo {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.login-logo h1 {
     color: #00ff66;
     font-size: 25px;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
+    margin: 12px 0;
 }
 
-.status {
-    display: block;
-    margin-top: 8px;
+.login-logo p {
+    color: #666;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+}
 
-    font-size: 11px;
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.login-form label {
     color: #777;
+    font-size: 10px;
+    letter-spacing: 1px;
+    margin-top: 8px;
 }
+
+.login-form input {
+    width: 100%;
+    background: #090909;
+    color: white;
+    border: 1px solid #222;
+    padding: 14px;
+    outline: none;
+    font-family: inherit;
+    transition: 0.2s;
+}
+
+.login-form input:focus {
+    border-color: #00ff66;
+    box-shadow: 0 0 10px rgba(0, 255, 102, 0.08);
+}
+
+.login-form button {
+    margin-top: 18px;
+}
+
+.login-message {
+    min-height: 18px;
+    text-align: center;
+    color: #00ff66;
+    font-size: 10px;
+}
+
+
+/* ==========================================
+   ELEMENTOS GENERALES
+========================================== */
 
 .dot {
     display: inline-block;
-
     width: 8px;
     height: 8px;
-
     background: #00ff66;
     border-radius: 50%;
-
-    margin-right: 6px;
-
     box-shadow: 0 0 10px #00ff66;
+}
+
+button {
+    background: #00ff66;
+    color: #000;
+    border: none;
+    padding: 13px 20px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    transition: 0.2s;
+}
+
+button:hover {
+    box-shadow: 0 0 18px rgba(0, 255, 102, 0.3);
+    transform: translateY(-1px);
+}
+
+button.secondary {
+    background: transparent;
+    color: #00ff66;
+    border: 1px solid rgba(0, 255, 102, 0.35);
+}
+
+button.secondary:hover {
+    background: rgba(0, 255, 102, 0.06);
+}
+
+
+/* ==========================================
+   TOPBAR
+========================================== */
+
+.topbar {
+    width: 100%;
+    min-height: 85px;
+    border-bottom: 1px solid #151515;
+    background: rgba(5, 5, 5, 0.94);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    padding: 18px 4%;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand h1 {
+    color: #00ff66;
+    font-size: 19px;
+    letter-spacing: 2px;
+}
+
+.brand span:not(.dot) {
+    color: #555;
+    font-size: 8px;
+    letter-spacing: 1px;
+}
+
+.system-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #00ff66;
+    font-size: 9px;
+    letter-spacing: 1px;
 }
 
 .users {
     display: flex;
-    gap: 30px;
+    align-items: center;
+    gap: 20px;
 }
 
-.users div {
+
+/* ==========================================
+   USUARIO CONECTADO
+========================================== */
+
+.active-user-card,
+.team-card {
     text-align: right;
 }
 
-.users strong {
+.active-user-label {
     display: block;
-    color: #ddd;
-    font-size: 12px;
+    color: #555;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    margin-bottom: 5px;
 }
 
-.users small {
+.active-user-card strong {
+    display: block;
     color: #00ff66;
-    font-size: 9px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
 }
+
+.active-user-card small,
+.team-card small {
+    display: block;
+    color: #777;
+    font-size: 9px;
+    margin-top: 5px;
+}
+
+.team-card strong {
+    display: block;
+    color: #ddd;
+    font-size: 11px;
+}
+
+.small-dot {
+    width: 6px;
+    height: 6px;
+    margin-right: 4px;
+    box-shadow: 0 0 7px #00ff66;
+}
+
+.logout-button {
+    white-space: nowrap;
+}
+
 
 /* ==========================================
    CONTENEDOR
 ========================================== */
 
 .container {
-    position: relative;
-    z-index: 1;
-
-    width: 88%;
-    max-width: 1250px;
-
-    margin: 45px auto;
+    width: min(1200px, 92%);
+    margin: 0 auto;
+    padding: 40px 0;
 }
+
+
+/* ==========================================
+   BIENVENIDA
+========================================== */
 
 .welcome {
+    border-left: 3px solid #00ff66;
+    padding: 20px 25px;
     margin-bottom: 30px;
+    background: rgba(0, 255, 102, 0.025);
 }
 
-.welcome p,
-.panel p {
+.welcome p {
     color: #00ff66;
-    font-size: 11px;
-    letter-spacing: 2px;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
 }
 
 .welcome h2 {
-    font-size: 28px;
-    margin: 8px 0;
+    font-size: 21px;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
 }
 
 .welcome span {
     color: #666;
-    font-size: 12px;
+    font-size: 10px;
 }
 
+
 /* ==========================================
-   TARJETAS
+   CARDS
 ========================================== */
 
 .cards {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-
     gap: 15px;
-
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .card {
-    background: rgba(12,12,12,0.95);
-
-    border: 1px solid #1c1c1c;
-
+    background: #090909;
+    border: 1px solid #181818;
     padding: 25px;
-
     min-height: 145px;
-
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     transition: 0.2s;
 }
 
 .card:hover {
-    border-color: #00ff66;
-    box-shadow: 0 0 20px rgba(0,255,102,0.08);
+    border-color: rgba(0, 255, 102, 0.3);
+    transform: translateY(-2px);
 }
 
-.card span {
-    color: #777;
-    font-size: 10px;
+.card.capital {
+    border-color: rgba(0, 255, 102, 0.35);
+}
+
+.card-label {
+    color: #666;
+    font-size: 9px;
     letter-spacing: 1px;
+    margin-bottom: 10px;
 }
 
-.card h3 {
-    margin-top: 18px;
-
+.card strong {
+    color: #eee;
     font-size: 27px;
+    margin-bottom: 7px;
+}
 
-    color: #fff;
+.card.capital strong {
+    color: #00ff66;
 }
 
 .card small {
     color: #555;
+    font-size: 9px;
 }
 
-.capital {
-    border-left: 3px solid #00ff66;
-}
-
-.capital h3 {
-    color: #00ff66;
-}
 
 /* ==========================================
-   PANELES
+   PANELS
 ========================================== */
 
 .panel {
-    background: rgba(10,10,10,0.95);
-
-    border: 1px solid #1b1b1b;
-
+    background: rgba(8, 8, 8, 0.92);
+    border: 1px solid #171717;
     padding: 28px;
-
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .panel-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     margin-bottom: 25px;
 }
 
-.panel h2 {
-    margin-top: 8px;
-    font-size: 20px;
+.panel-header p {
+    color: #00ff66;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    margin-bottom: 7px;
 }
+
+.panel-header h2 {
+    font-size: 17px;
+    font-weight: normal;
+}
+
 
 /* ==========================================
    FORMULARIO
@@ -215,40 +403,31 @@ body {
 
 .form {
     display: grid;
-
     grid-template-columns: 1fr 1fr auto;
-
     gap: 15px;
-
     align-items: end;
 }
 
+.input-box {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
 .input-box label {
-    display: block;
-
     color: #777;
-
-    font-size: 10px;
-
-    margin-bottom: 8px;
+    font-size: 9px;
+    letter-spacing: 1px;
 }
 
 .input-box input {
-    width: 100%;
-
     background: #050505;
-
-    color: #00ff66;
-
-    border: 1px solid #292929;
-
+    border: 1px solid #242424;
+    color: #eee;
     padding: 14px;
-
-    outline: none;
-
     font-family: inherit;
-
-    font-size: 15px;
+    outline: none;
+    width: 100%;
 }
 
 .input-box input:focus {
@@ -256,56 +435,10 @@ body {
 }
 
 .input-box small {
-    display: block;
-
     color: #444;
-
-    font-size: 9px;
-
-    margin-top: 7px;
+    font-size: 8px;
 }
 
-/* ==========================================
-   BOTONES
-========================================== */
-
-button {
-    background: #00ff66;
-
-    color: #000;
-
-    border: none;
-
-    padding: 15px 20px;
-
-    cursor: pointer;
-
-    font-family: inherit;
-
-    font-weight: bold;
-
-    transition: 0.2s;
-}
-
-button:hover {
-    box-shadow: 0 0 20px rgba(0,255,102,0.4);
-}
-
-.secondary {
-    background: transparent;
-
-    color: #666;
-
-    border: 1px solid #333;
-
-    padding: 9px 15px;
-}
-
-.secondary:hover {
-    color: #ff4444;
-    border-color: #ff4444;
-    box-shadow: none;
-}
 
 /* ==========================================
    TABLA
@@ -317,51 +450,53 @@ button:hover {
 
 table {
     width: 100%;
-
     border-collapse: collapse;
+    min-width: 600px;
 }
 
 th {
-    text-align: left;
-
     color: #555;
-
-    font-size: 10px;
-
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-align: left;
     padding: 13px;
-
     border-bottom: 1px solid #222;
 }
 
 td {
-    padding: 15px 13px;
-
-    border-bottom: 1px solid #151515;
-
-    font-size: 12px;
+    color: #aaa;
+    font-size: 10px;
+    padding: 14px 13px;
+    border-bottom: 1px solid #111;
 }
 
-.profit {
-    color: #00ff66;
+.profit,
+.positive {
+    color: #00ff66 !important;
 }
 
-.loss {
-    color: #ff4444;
+.loss,
+.negative {
+    color: #ff4444 !important;
 }
+
+.history-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
 
 /* ==========================================
-   GRÁFICA
+   GRÁFICO
 ========================================== */
 
 .chart-container {
     position: relative;
-
     width: 100%;
-
     height: 330px;
-
-    margin-top: 10px;
 }
+
 
 /* ==========================================
    CALENDARIO
@@ -371,337 +506,205 @@ td {
     width: 100%;
 }
 
-/* CABECERA DEL CALENDARIO */
-
 .calendar-header {
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .calendar-header h3 {
-    margin: 0;
-
-    color: #00ff66;
-
-    text-transform: uppercase;
-
+    font-size: 14px;
+    font-weight: normal;
     letter-spacing: 1px;
-
-    font-size: 16px;
-
-    text-align: center;
+    color: #ddd;
 }
 
 .calendar-header button {
-    width: 42px;
-
-    height: 42px;
-
-    border: 1px solid rgba(255,255,255,0.15);
-
-    background: rgba(255,255,255,0.04);
-
-    color: #00ff66;
-
-    border-radius: 8px;
-
-    cursor: pointer;
-
-    font-size: 16px;
-
-    padding: 0;
+    padding: 9px 14px;
 }
-
-.calendar-header button:hover {
-    background: rgba(0,255,102,0.10);
-
-    box-shadow:
-        0 0 15px rgba(0,255,102,0.15);
-}
-
-/* DIAS DE LA SEMANA */
 
 .calendar-weekdays {
     display: grid;
-
     grid-template-columns: repeat(7, minmax(0, 1fr));
-
     gap: 8px;
-
     margin-bottom: 8px;
 }
 
 .calendar-weekdays span {
     text-align: center;
-
     color: #555;
-
-    font-size: 10px;
-
-    letter-spacing: 1px;
-
+    font-size: 8px;
     padding: 8px 0;
 }
 
-/* CONTENEDOR DE TODOS LOS DIAS */
-
 .calendar-days {
     display: grid;
-
     grid-template-columns: repeat(7, minmax(0, 1fr));
-
     grid-auto-rows: minmax(75px, auto);
-
     gap: 8px;
-
     width: 100%;
 }
 
-/* CADA CUADRO */
-
 .calendar-day {
+    background: #080808;
+    border: 1px solid #161616;
+    padding: 9px;
     min-width: 0;
-
-    min-height: 75px;
-
-    padding: 10px;
-
-    border: 1px solid rgba(255,255,255,0.08);
-
-    background: rgba(255,255,255,0.025);
-
-    border-radius: 8px;
-
-    position: relative;
-
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
     transition: 0.2s;
-
-    overflow: hidden;
 }
 
 .calendar-day:hover {
-    background: rgba(255,255,255,0.07);
-
-    transform: translateY(-2px);
+    border-color: #333;
 }
-
-/* ESPACIOS ANTES DEL DIA 1 */
 
 .calendar-day.empty {
-    border: none;
-
     background: transparent;
-
-    pointer-events: none;
+    border-color: transparent;
 }
-
-/* NUMERO DEL DIA */
 
 .calendar-number {
-    color: #aaa;
-
-    font-size: 13px;
-
-    font-weight: bold;
+    color: #888;
+    font-size: 10px;
 }
 
-/* RESULTADO */
+.day-number {
+    color: #888;
+    font-size: 10px;
+}
 
 .calendar-result {
-    margin-top: 12px;
-
-    font-size: 11px;
-
-    font-weight: bold;
-
-    white-space: nowrap;
+    font-size: 9px;
 }
 
-/* GANANCIA */
-
+.calendar-day .positive,
 .calendar-day.positive {
-    border-color: rgba(0,255,102,0.35);
-
-    background: rgba(0,255,102,0.06);
+    border-color: rgba(0, 255, 102, 0.45);
+    background: rgba(0, 255, 102, 0.035);
 }
 
-.calendar-day.positive .calendar-number {
-    color: #00ff66;
-}
-
-.calendar-day.positive .calendar-result {
-    color: #00ff66;
-}
-
-/* PERDIDA */
-
+.calendar-day .negative,
 .calendar-day.negative {
-    border-color: rgba(255,68,68,0.35);
-
-    background: rgba(255,68,68,0.06);
+    border-color: rgba(255, 68, 68, 0.45);
+    background: rgba(255, 68, 68, 0.035);
 }
 
-.calendar-day.negative .calendar-number {
-    color: #ff4444;
+.calendar-day.neutral {
+    border-color: rgba(255, 255, 255, 0.06);
 }
-
-.calendar-day.negative .calendar-result {
-    color: #ff4444;
-}
-
-/* DIA ACTUAL */
 
 .calendar-day.today {
-    box-shadow:
-        0 0 0 1px #00ff66,
-        0 0 12px rgba(0,255,102,0.15);
+    box-shadow: inset 0 0 0 1px #00ff66;
 }
 
-.calendar-day.today .calendar-number {
-    color: #00ff66;
+.calendar-day small {
+    font-size: 8px;
+    color: #666;
 }
-
-/* LEYENDA */
 
 .calendar-legend {
     display: flex;
-
+    align-items: center;
     gap: 20px;
-
-    margin-top: 20px;
-
-    flex-wrap: wrap;
-
-    font-size: 10px;
-
-    color: #777;
+    margin-top: 18px;
+    color: #666;
+    font-size: 9px;
 }
 
 .calendar-legend span {
     display: flex;
-
     align-items: center;
-
-    gap: 7px;
+    gap: 6px;
 }
 
 .calendar-legend i {
-    width: 10px;
-
-    height: 10px;
-
-    border-radius: 50%;
-
     display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
 }
 
 .legend-positive {
     background: #00ff66;
-
-    box-shadow:
-        0 0 8px rgba(0,255,102,0.5);
 }
 
 .legend-negative {
     background: #ff4444;
-
-    box-shadow:
-        0 0 8px rgba(255,68,68,0.4);
 }
 
 .legend-neutral {
-    background: #555;
+    background: #444;
 }
+
 
 /* ==========================================
-   ESTADISTICAS
+   ESTADÍSTICAS
 ========================================== */
 
-.statistics {
-    margin-bottom: 40px;
-}
-
-.stats-grid {
+.stats {
     display: grid;
-
-    grid-template-columns: repeat(4, 1fr);
-
+    grid-template-columns: repeat(3, 1fr);
     gap: 15px;
-
-    margin-top: 20px;
 }
 
-.stats-grid div {
-    border-left: 1px solid #292929;
-
-    padding: 12px;
+.stat {
+    background: #070707;
+    border: 1px solid #171717;
+    padding: 20px;
 }
 
-.stats-grid span {
+.stat span {
     display: block;
-
     color: #555;
-
-    font-size: 9px;
+    font-size: 8px;
+    letter-spacing: 1px;
+    margin-bottom: 9px;
 }
 
-.stats-grid strong {
-    display: block;
-
-    margin-top: 8px;
-
-    font-size: 18px;
+.stat strong {
+    font-size: 21px;
+    color: #00ff66;
 }
+
 
 /* ==========================================
    FOOTER
 ========================================== */
 
 footer {
-    position: relative;
-
-    display: flex;
-
-    justify-content: space-between;
-
-    padding: 20px 6%;
-
-    border-top: 1px solid #1b1b1b;
-
+    border-top: 1px solid #151515;
+    text-align: center;
+    padding: 30px 20px;
     color: #444;
-
-    font-size: 10px;
 }
 
-footer b {
-    color: #00ff66;
+footer p {
+    font-size: 9px;
+    margin-bottom: 7px;
 }
+
+footer span {
+    font-size: 8px;
+    letter-spacing: 1px;
+}
+
 
 /* ==========================================
-   TABLET
+   RESPONSIVE
 ========================================== */
 
-@media (max-width: 850px) {
+@media (max-width: 950px) {
 
     .topbar {
-        align-items: flex-start;
-
-        gap: 20px;
+        flex-wrap: wrap;
     }
 
-    .users {
-        flex-direction: column;
-
-        gap: 8px;
-    }
-
-    .users div {
-        text-align: right;
+    .system-status {
+        order: 3;
+        width: 100%;
     }
 
     .cards {
@@ -709,123 +712,100 @@ footer b {
     }
 
     .form {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
     }
 
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .form button {
+        grid-column: 1 / -1;
     }
 
-    .chart-container {
-        height: 280px;
-    }
-
-    .calendar-days,
-    .calendar-weekdays {
-        gap: 6px;
-    }
-
-    .calendar-day {
-        min-height: 70px;
-    }
 }
 
-/* ==========================================
-   CELULAR
-========================================== */
 
 @media (max-width: 550px) {
 
     .topbar {
-        flex-direction: column;
+        padding: 15px;
+        align-items: flex-start;
+    }
+
+    .brand h1 {
+        font-size: 16px;
     }
 
     .users {
-        flex-direction: row;
-
         width: 100%;
-
-        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
     }
 
-    .users div {
+    .active-user-card,
+    .team-card {
         text-align: left;
+    }
+
+    .logout-button {
+        width: 100%;
     }
 
     .container {
         width: 94%;
-
-        margin-top: 30px;
+        padding: 25px 0;
     }
 
     .cards {
         grid-template-columns: 1fr;
     }
 
+    .card {
+        min-height: 125px;
+    }
+
     .panel {
-        padding: 20px;
+        padding: 18px;
     }
 
-    .welcome h2 {
-        font-size: 23px;
+    .form {
+        grid-template-columns: 1fr;
     }
 
-    .chart-container {
-        height: 240px;
+    .form button {
+        grid-column: auto;
+        width: 100%;
     }
 
-    /* CALENDARIO EN CELULAR */
-
-    .calendar-weekdays,
     .calendar-days {
         gap: 4px;
-    }
-
-    .calendar-weekdays span {
-        font-size: 8px;
-
-        letter-spacing: 0;
+        grid-auto-rows: minmax(55px, auto);
     }
 
     .calendar-day {
-        min-height: 60px;
-
-        padding: 6px;
-
-        border-radius: 5px;
+        padding: 5px;
     }
 
-    .calendar-number {
-        font-size: 11px;
+    .calendar-day small {
+        font-size: 7px;
     }
 
-    .calendar-result {
-        font-size: 8px;
-
-        margin-top: 8px;
-    }
-
-    .calendar-header h3 {
-        font-size: 13px;
-    }
-
-    .calendar-header button {
-        width: 35px;
-
-        height: 35px;
-
-        font-size: 12px;
+    .calendar-weekdays {
+        gap: 4px;
     }
 
     .calendar-legend {
+        flex-wrap: wrap;
         gap: 10px;
-
-        font-size: 9px;
     }
 
-    footer {
-        flex-direction: column;
-
-        gap: 8px;
+    .stats {
+        grid-template-columns: 1fr;
     }
+
+    .chart-container {
+        height: 250px;
+    }
+
+    .login-box {
+        padding: 25px;
+    }
+
 }
