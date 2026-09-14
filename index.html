@@ -9,7 +9,7 @@
 
     <link rel="stylesheet" href="style.css">
 
-    <!-- Librería para la gráfica -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
@@ -47,6 +47,8 @@
 
     <main class="container">
 
+        <!-- BIENVENIDA -->
+
         <section class="welcome">
 
             <p>/// TRADING CONTROL SYSTEM</p>
@@ -58,7 +60,7 @@
         </section>
 
 
-        <!-- TARJETAS PRINCIPALES -->
+        <!-- TARJETAS -->
 
         <section class="cards">
 
@@ -140,7 +142,7 @@
         </section>
 
 
-        <!-- REGISTRAR RESULTADO -->
+        <!-- REGISTRO -->
 
         <section class="panel">
 
@@ -177,7 +179,8 @@
 
 
                     <small>
-                        Usa números positivos para ganancias y negativos para pérdidas.
+                        Usa números positivos para ganancias
+                        y negativos para pérdidas.
                     </small>
 
                 </div>
@@ -201,9 +204,7 @@
 
 
                 <button onclick="registrarResultado()">
-
                     + REGISTRAR OPERACIÓN
-
                 </button>
 
             </div>
@@ -247,11 +248,8 @@
                         <tr>
 
                             <th>FECHA</th>
-
                             <th>RESULTADO</th>
-
                             <th>OPERACIONES</th>
-
                             <th>CAPITAL</th>
 
                         </tr>
@@ -260,10 +258,103 @@
 
 
                     <tbody id="historial">
-
                     </tbody>
 
                 </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- CALENDARIO -->
+
+        <section class="panel">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <p>/// CALENDARIO</p>
+
+                    <h2>
+                        Resultados diarios
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="calendar">
+
+                <div class="calendar-header">
+
+                    <button onclick="mesAnterior()">
+                        ◀
+                    </button>
+
+
+                    <h3 id="mesActual">
+                        SEPTIEMBRE 2026
+                    </h3>
+
+
+                    <button onclick="mesSiguiente()">
+                        ▶
+                    </button>
+
+                </div>
+
+
+                <div class="calendar-weekdays">
+
+                    <span>LUN</span>
+                    <span>MAR</span>
+                    <span>MIÉ</span>
+                    <span>JUE</span>
+                    <span>VIE</span>
+                    <span>SÁB</span>
+                    <span>DOM</span>
+
+                </div>
+
+
+                <div
+                    id="calendarioDias"
+                    class="calendar-days">
+                </div>
+
+
+                <div class="calendar-legend">
+
+                    <span>
+
+                        <i class="legend-positive"></i>
+
+                        Ganancia
+
+                    </span>
+
+
+                    <span>
+
+                        <i class="legend-negative"></i>
+
+                        Pérdida
+
+                    </span>
+
+
+                    <span>
+
+                        <i class="legend-neutral"></i>
+
+                        Sin operación
+
+                    </span>
+
+                </div>
 
             </div>
 
@@ -348,9 +439,7 @@
 
             SYSTEM STATUS:
 
-            <b>
-                ONLINE
-            </b>
+            <b>ONLINE</b>
 
         </span>
 
