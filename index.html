@@ -309,9 +309,7 @@
 
                 <div class="chart-container">
 
-                    <canvas
-                        id="capitalChart"
-                    ></canvas>
+                    <canvas id="capitalChart"></canvas>
 
                 </div>
 
@@ -355,8 +353,8 @@
                         >
 
                         <small>
-                            Usa números positivos para
-                            ganancias y negativos para pérdidas.
+                            Usa números positivos para ganancias
+                            y negativos para pérdidas.
                         </small>
 
                     </div>
@@ -429,11 +427,8 @@
                             <tr>
 
                                 <th>FECHA</th>
-
                                 <th>USUARIO</th>
-
                                 <th>RESULTADO</th>
-
                                 <th>OPERACIONES</th>
 
                             </tr>
@@ -625,12 +620,43 @@
     </div>
 
 
-    <!-- JAVASCRIPT DE MILLAN TRADING -->
+    <!-- ======================================
+         CARGA DEL JAVASCRIPT
+    ======================================= -->
 
-    <script src="./script.js?v=2"></script>
+    <script>
+
+        const scriptMillan = document.createElement("script");
+
+        scriptMillan.src = "./script.js?v=" + Date.now();
+
+        scriptMillan.onload = function () {
+
+            console.log("⚡ MILLAN TRADING: SCRIPT CARGADO");
+
+            if (typeof comprobarSesion === "function") {
+
+                comprobarSesion();
+
+            }
+
+        };
+
+        scriptMillan.onerror = function () {
+
+            console.error(
+                "❌ MILLAN TRADING: ERROR CARGANDO SCRIPT"
+            );
+
+        };
+
+        document.body.appendChild(scriptMillan);
+
+    </script>
 
 </body>
 
 </html>
 ```
+
 
