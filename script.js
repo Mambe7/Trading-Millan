@@ -12,29 +12,25 @@ const SUPABASE_URL = "https://pemasiezuewkboeuudys.supabase.co";
 
 const SUPABASE_KEY = "sb_publishable_DveagRUAISleOisJ0B9TjA_fXXSyWJs";
 
-// CAPITAL INICIAL
 const CAPITAL_INICIAL = 540;
 
-// VARIABLES GLOBALES
 let registros = [];
 let capitalChart = null;
 let fechaCalendario = new Date();
+let usuarioActual = null;
 
 
 // ==========================================
-// INICIO
+// INICIAR APLICACIÓN
 // ==========================================
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+document.addEventListener("DOMContentLoaded", async function () {
 
-        mostrarFecha();
+    mostrarFecha();
 
-        cargarDatos();
+    await comprobarSesion();
 
-    }
-);
+});
 
 
 // ==========================================
@@ -43,53 +39,294 @@ document.addEventListener(
 
 function mostrarFecha() {
 
-    const elemento =
-        document.getElementById("fechaActual");
+    const elementoFecha = document.getElementById("fecha");
 
-    if (!elemento) return;
+    if (!elementoFecha) {
+        return;
+    }
 
     const ahora = new Date();
 
-    elemento.textContent =
-        ahora.toLocaleDateString(
-            "es-CO",
-            {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric"
-            }
-        ).toUpperCase();
+    const opciones = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+    };
+
+    elementoFecha.textContent =
+        ahora.toLocaleDateString("es-CO", opciones).toUpperCase();
 
 }
 
 
 // ==========================================
-// CARGAR DATOS DESDE SUPABASE
+// COMPROBAR SESIÓN
 // ==========================================
 
-async function cargarDatos() {
+async function comprobarSesion() {
+
+    const accessToken =
+        localStorage.getItem("millan_access_token");
+
+    if (!accessToken) {
+
+        mostrarLogin();
+
+        return;
+    }
 
     try {
 
-        const respuesta =
+        const respuesta = await fetch(
+            `${SUPABASE_URL}/auth/v1/user`,
+            {
+                method: "GET",
+
+                headers: {
+                    "apikey": SUPABASE_KEY,
+                    "Authorization": `Bearer ${accessToken}`
+                }
+            }
+        );
+
+        if (!respuesta.ok) {
+
+            localStorage.removeItem("millan_access_token");
+            localStorage.removeItem("millan_refresh_token");
+
+            mostrarLogin();
+
+            return;
+        }
+
+        usuarioActual = await respuesta.json();
+
+        mostrarAplicacion();
+
+    } catch (error) {
+
+        console.error("Error comprobando sesión:", error);
+
+        mostrarLogin();
+
+    }
+
+}
+
+
+// ==========================================
+// MOSTRAR LOGIN
+// ==========================================
+
+function mostrarLogin() {
+
+    const loginScreen =
+        document.getElementById("loginScreen");
+
+    const app =
+        document.getElementById("app");
+
+    if (loginScreen) {
+        loginScreen.style.display = "flex";
+    }
+
+    if (app) {
+        app.style.display = "none";
+    }
+
+}
+
+
+// ==========================================
+// MOSTRAR APLICACIÓN
+// ==========================================
+
+async function mostrarAplicacion() {
+
+    const loginScreen =
+        document.getElementById("loginScreen");
+
+    const app =
+        document.getElementById("app");
+
+    if (loginScreen) {
+        loginScreen.style.display = "none";
+    }
+
+    if (app) {
+        app.style.display = "block";
+    }
+
+    await cargarDatos();
+
+}
+
+
+// ==========================================
+// INICIAR SESIÓN
+// ==========================================
+
+async function iniciarSesion() {
+
+    const email =
+        document.getElementById("loginEmail").value.trim();
+
+    const password =
+        document.getElementById("loginPassword").value;
+
+    const mensaje =
+        document.getElementById("loginMessage");
+
+    if (!email || !password) {
+
+        mensaje.textContent =
+            "Ingresa tu correo y contraseña.";
+
+        return;
+    }
+
+    mensaje.textContent =
+        "Iniciando sesión...";
+
+    try {
+
+        const respuesta = await fetch(
+            `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "apikey": SUPABASE_KEY
+                },
+
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            }
+        );
+
+        const datos = await respuesta.json();
+
+        if (!respuesta.ok) {
+
+            console.error(
+                "Error de inicio de sesión:",
+                datos
+            );
+
+            mensaje.textContent =
+                "Correo o contraseña incorrectos.";
+
+            return;
+        }
+
+        localStorage.setItem(
+            "millan_access_token",
+            datos.access_token
+        );
+
+        localStorage.setItem(
+            "millan_refresh_token",
+            datos.refresh_token
+        );
+
+        usuarioActual = datos.user;
+
+        mensaje.textContent =
+            "Acceso correcto.";
+
+        await mostrarAplicacion();
+
+    } catch (error) {
+
+        console.error("Error:", error);
+
+        mensaje.textContent =
+            "No se pudo conectar con el servidor.";
+
+    }
+
+}
+
+
+// ==========================================
+// CERRAR SESIÓN
+// ==========================================
+
+async function cerrarSesion() {
+
+    const accessToken =
+        localStorage.getItem("millan_access_token");
+
+    if (accessToken) {
+
+        try {
+
             await fetch(
-                `${SUPABASE_URL}/rest/v1/operaciones?select=*&order=Fecha.asc`,
+                `${SUPABASE_URL}/auth/v1/logout`,
                 {
-                    method: "GET",
+                    method: "POST",
 
                     headers: {
-
-                        "apikey":
-                            SUPABASE_KEY,
-
-                        "Authorization":
-                            `Bearer ${SUPABASE_KEY}`
-
+                        "apikey": SUPABASE_KEY,
+                        "Authorization": `Bearer ${accessToken}`
                     }
                 }
             );
 
+        } catch (error) {
+
+            console.error(
+                "Error cerrando sesión:",
+                error
+            );
+
+        }
+
+    }
+
+    localStorage.removeItem("millan_access_token");
+    localStorage.removeItem("millan_refresh_token");
+
+    usuarioActual = null;
+
+    mostrarLogin();
+
+}
+
+
+// ==========================================
+// CARGAR DATOS
+// ==========================================
+
+async function cargarDatos() {
+
+    const accessToken =
+        localStorage.getItem("millan_access_token");
+
+    if (!accessToken) {
+
+        mostrarLogin();
+
+        return;
+    }
+
+    try {
+
+        const respuesta = await fetch(
+            `${SUPABASE_URL}/rest/v1/operaciones?select=*&order=Fecha.asc`,
+            {
+                method: "GET",
+
+                headers: {
+                    "apikey": SUPABASE_KEY,
+                    "Authorization": `Bearer ${accessToken}`
+                }
+            }
+        );
 
         if (!respuesta.ok) {
 
@@ -97,42 +334,142 @@ async function cargarDatos() {
                 await respuesta.text();
 
             console.error(
-                "ERROR SUPABASE:",
+                "Error cargando datos:",
                 error
             );
 
             return;
-
         }
 
+        registros = await respuesta.json();
 
-        registros =
-            await respuesta.json();
-
-
-        console.log(
-            "Registros cargados:",
-            registros
-        );
-
-
-        actualizarPanel();
-
-        actualizarHistorial();
-
-        actualizarGrafica();
-
-        actualizarCalendario();
-
+        actualizarInterfaz();
 
     } catch (error) {
 
-        console.error(
-            "ERROR AL CARGAR DATOS:",
-            error
-        );
+        console.error("Error:", error);
 
     }
+
+}
+
+
+// ==========================================
+// ACTUALIZAR INTERFAZ
+// ==========================================
+
+function actualizarInterfaz() {
+
+    let totalResultado = 0;
+    let totalOperaciones = 0;
+
+    registros.forEach(function (registro) {
+
+        totalResultado +=
+            Number(registro.Resultado) || 0;
+
+        totalOperaciones +=
+            Number(registro.Operaciones) || 0;
+
+    });
+
+    const capitalActual =
+        CAPITAL_INICIAL + totalResultado;
+
+    const hoy =
+        new Date().toISOString().split("T")[0];
+
+    let resultadoHoy = 0;
+
+    registros.forEach(function (registro) {
+
+        if (registro.Fecha === hoy) {
+
+            resultadoHoy +=
+                Number(registro.Resultado) || 0;
+
+        }
+
+    });
+
+    const rentabilidad =
+        CAPITAL_INICIAL !== 0
+            ? (totalResultado / CAPITAL_INICIAL) * 100
+            : 0;
+
+    const capitalElemento =
+        document.getElementById("capital");
+
+    const resultadoElemento =
+        document.getElementById("resultado");
+
+    const operacionesElemento =
+        document.getElementById("operaciones");
+
+    const rentabilidadElemento =
+        document.getElementById("rentabilidad");
+
+    if (capitalElemento) {
+
+        capitalElemento.textContent =
+            `$${capitalActual.toFixed(2)}`;
+
+    }
+
+    if (resultadoElemento) {
+
+        resultadoElemento.textContent =
+            formatearResultado(resultadoHoy);
+
+    }
+
+    if (operacionesElemento) {
+
+        operacionesElemento.textContent =
+            totalOperaciones;
+
+    }
+
+    if (rentabilidadElemento) {
+
+        rentabilidadElemento.textContent =
+            `${rentabilidad.toFixed(2)}%`;
+
+    }
+
+    mostrarHistorial();
+
+    actualizarEstadisticas();
+
+    actualizarGrafico();
+
+    actualizarCalendario();
+
+}
+
+
+// ==========================================
+// FORMATEAR RESULTADO
+// ==========================================
+
+function formatearResultado(valor) {
+
+    const numero =
+        Number(valor) || 0;
+
+    if (numero > 0) {
+
+        return `+$${numero.toFixed(2)}`;
+
+    }
+
+    if (numero < 0) {
+
+        return `-$${Math.abs(numero).toFixed(2)}`;
+
+    }
+
+    return "$0.00";
 
 }
 
@@ -143,229 +480,138 @@ async function cargarDatos() {
 
 async function registrarResultado() {
 
-    const resultadoInput =
-        document.getElementById(
-            "resultadoInput"
-        );
+    const accessToken =
+        localStorage.getItem("millan_access_token");
+
+    if (!accessToken) {
+
+        mostrarLogin();
+
+        return;
+    }
+
+    const gananciaInput =
+        document.getElementById("ganancia");
 
     const operacionesInput =
-        document.getElementById(
-            "operacionesInput"
-        );
-
-
-    if (
-        !resultadoInput ||
-        !operacionesInput
-    ) {
-
-        alert(
-            "No se encontraron los campos de registro."
-        );
-
-        return;
-
-    }
-
+        document.getElementById("numeroOperaciones");
 
     const resultado =
-        Number(
-            resultadoInput.value
-        );
-
+        Number(gananciaInput.value);
 
     const operaciones =
-        Number(
-            operacionesInput.value
-        );
+        Number(operacionesInput.value);
 
+    if (isNaN(resultado)) {
 
-    if (
-        isNaN(resultado) ||
-        isNaN(operaciones)
-    ) {
+        alert("Ingresa un resultado válido.");
+
+        return;
+    }
+
+    if (isNaN(operaciones) || operaciones < 1) {
 
         alert(
-            "Ingresa datos válidos."
+            "Ingresa un número de operaciones válido."
         );
 
         return;
-
     }
-
-
-    if (
-        operaciones <= 0
-    ) {
-
-        alert(
-            "La cantidad de operaciones debe ser mayor que 0."
-        );
-
-        return;
-
-    }
-
-
-    const usuario =
-        prompt(
-            "¿Quién está registrando?\n\n1 = Juan Millan Grisales\n2 = Edilberto Millan"
-        );
-
-
-    let nombreUsuario = "";
-
-
-    if (
-        usuario === "1"
-    ) {
-
-        nombreUsuario =
-            "JUAN MILLAN GRISALES";
-
-    } else if (
-        usuario === "2"
-    ) {
-
-        nombreUsuario =
-            "EDILBERTO MILLAN";
-
-    } else {
-
-        alert(
-            "Usuario no válido."
-        );
-
-        return;
-
-    }
-
-
-    const ahora =
-        new Date();
-
-
-    const año =
-        ahora.getFullYear();
-
-
-    const mes =
-        String(
-            ahora.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        );
-
-
-    const dia =
-        String(
-            ahora.getDate()
-        ).padStart(
-            2,
-            "0"
-        );
-
 
     const hoy =
-        `${año}-${mes}-${dia}`;
+        new Date().toISOString().split("T")[0];
 
+    let nombreUsuario = "Usuario";
 
-    const nuevoRegistro = {
+    if (
+        usuarioActual &&
+        usuarioActual.email
+    ) {
 
-        Fecha:
-            hoy,
+        const email =
+            usuarioActual.email.toLowerCase();
 
-        Resultado:
-            resultado,
+        if (email.includes("juan")) {
 
-        Operaciones:
-            operaciones,
+            nombreUsuario =
+                "JUAN MILLAN GRISALES";
 
-        Usuario:
-            nombreUsuario
+        } else if (
+            email.includes("edilberto")
+        ) {
 
-    };
+            nombreUsuario =
+                "EDILBERTO MILLAN";
 
+        } else {
 
-    try {
-
-        const respuesta =
-            await fetch(
-                `${SUPABASE_URL}/rest/v1/operaciones`,
-                {
-
-                    method:
-                        "POST",
-
-                    headers: {
-
-                        "apikey":
-                            SUPABASE_KEY,
-
-                        "Authorization":
-                            `Bearer ${SUPABASE_KEY}`,
-
-                        "Content-Type":
-                            "application/json",
-
-                        "Prefer":
-                            "return=minimal"
-
-                    },
-
-                    body:
-                        JSON.stringify(
-                            nuevoRegistro
-                        )
-
-                }
-            );
-
-
-        if (!respuesta.ok) {
-
-            const error =
-                await respuesta.text();
-
-            console.error(
-                "ERROR AL REGISTRAR:",
-                error
-            );
-
-            alert(
-                "No se pudo registrar el resultado."
-            );
-
-            return;
+            nombreUsuario =
+                usuarioActual.email;
 
         }
 
+    }
+
+    const nuevoRegistro = {
+
+        Fecha: hoy,
+        Resultado: resultado,
+        Operaciones: operaciones,
+        Usuario: nombreUsuario
+
+    };
+
+    try {
+
+        const respuesta = await fetch(
+            `${SUPABASE_URL}/rest/v1/operaciones`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "apikey": SUPABASE_KEY,
+                    "Authorization": `Bearer ${accessToken}`,
+                    "Prefer": "return=representation"
+                },
+
+                body: JSON.stringify(nuevoRegistro)
+            }
+        );
+
+        const datos =
+            await respuesta.text();
+
+        if (!respuesta.ok) {
+
+            console.error(
+                "Error registrando:",
+                datos
+            );
+
+            alert(
+                "No se pudo registrar el resultado.\n\n" +
+                datos
+            );
+
+            return;
+        }
+
+        gananciaInput.value = "";
+        operacionesInput.value = "";
 
         alert(
             "Resultado registrado correctamente."
         );
 
-
-        resultadoInput.value =
-            "";
-
-        operacionesInput.value =
-            "";
-
-
         await cargarDatos();
-
 
     } catch (error) {
 
-        console.error(
-            "ERROR:",
-            error
-        );
+        console.error("Error:", error);
 
         alert(
-            "Ocurrió un error al registrar."
+            "Error de conexión con Supabase."
         );
 
     }
@@ -374,384 +620,165 @@ async function registrarResultado() {
 
 
 // ==========================================
-// ACTUALIZAR PANEL
+// MOSTRAR HISTORIAL
 // ==========================================
 
-function actualizarPanel() {
-
-    let gananciaTotal = 0;
-
-    let operacionesTotales = 0;
-
-
-    registros.forEach(
-        registro => {
-
-            gananciaTotal +=
-                Number(
-                    registro.Resultado
-                ) || 0;
-
-
-            operacionesTotales +=
-                Number(
-                    registro.Operaciones
-                ) || 0;
-
-        }
-    );
-
-
-    const capitalActual =
-        CAPITAL_INICIAL +
-        gananciaTotal;
-
-
-    const rentabilidad =
-        (
-            gananciaTotal /
-            CAPITAL_INICIAL
-        ) * 100;
-
-
-    const ahora =
-        new Date();
-
-
-    const hoy =
-        `${ahora.getFullYear()}-${String(
-            ahora.getMonth() + 1
-        ).padStart(
-            2,
-            "0"
-        )}-${String(
-            ahora.getDate()
-        ).padStart(
-            2,
-            "0"
-        )}`;
-
-
-    let resultadoHoy = 0;
-
-    let operacionesHoy = 0;
-
-
-    registros.forEach(
-        registro => {
-
-            if (
-                registro.Fecha === hoy
-            ) {
-
-                resultadoHoy +=
-                    Number(
-                        registro.Resultado
-                    ) || 0;
-
-
-                operacionesHoy +=
-                    Number(
-                        registro.Operaciones
-                    ) || 0;
-
-            }
-
-        }
-    );
-
-
-    const capital =
-        document.getElementById(
-            "capital"
-        );
-
-
-    if (capital) {
-
-        capital.textContent =
-            formatearDinero(
-                capitalActual
-            );
-
-    }
-
-
-    const resultado =
-        document.getElementById(
-            "resultado"
-        );
-
-
-    if (resultado) {
-
-        resultado.textContent =
-            formatearDinero(
-                resultadoHoy
-            );
-
-    }
-
-
-    const operaciones =
-        document.getElementById(
-            "operaciones"
-        );
-
-
-    if (operaciones) {
-
-        operaciones.textContent =
-            operacionesHoy;
-
-    }
-
-
-    const rentabilidadElemento =
-        document.getElementById(
-            "rentabilidad"
-        );
-
-
-    if (rentabilidadElemento) {
-
-        rentabilidadElemento.textContent =
-            rentabilidad.toFixed(2) +
-            "%";
-
-    }
-
-
-    const gananciaTotalElemento =
-        document.getElementById(
-            "gananciaTotal"
-        );
-
-
-    if (gananciaTotalElemento) {
-
-        gananciaTotalElemento.textContent =
-            formatearDinero(
-                gananciaTotal
-            );
-
-    }
-
-
-    const totalOperaciones =
-        document.getElementById(
-            "totalOperaciones"
-        );
-
-
-    if (totalOperaciones) {
-
-        totalOperaciones.textContent =
-            operacionesTotales;
-
-    }
-
-
-    const diasUnicos =
-        new Set(
-            registros.map(
-                registro =>
-                    registro.Fecha
-            )
-        );
-
-
-    const diasRegistrados =
-        document.getElementById(
-            "diasRegistrados"
-        );
-
-
-    if (diasRegistrados) {
-
-        diasRegistrados.textContent =
-            diasUnicos.size;
-
-    }
-
-
-    const resultadoTexto =
-        document.getElementById(
-            "resultadoTexto"
-        );
-
-
-    if (!resultadoTexto) return;
-
-
-    if (
-        resultadoHoy > 0
-    ) {
-
-        resultadoTexto.textContent =
-            "Día positivo 📈";
-
-    } else if (
-        resultadoHoy < 0
-    ) {
-
-        resultadoTexto.textContent =
-            "Día negativo 📉";
-
-    } else {
-
-        resultadoTexto.textContent =
-            "Sin operaciones";
-
-    }
-
-}
-
-
-// ==========================================
-// HISTORIAL
-// ==========================================
-
-function actualizarHistorial() {
+function mostrarHistorial() {
 
     const historial =
-        document.getElementById(
-            "historial"
-        );
+        document.getElementById("historial");
 
+    if (!historial) {
+        return;
+    }
 
-    if (!historial) return;
+    historial.innerHTML = "";
 
+    const registrosOrdenados =
+        [...registros].reverse();
 
-    historial.innerHTML =
-        "";
+    registrosOrdenados.forEach(function (registro) {
 
+        const fila =
+            document.createElement("tr");
 
-    let capital =
-        CAPITAL_INICIAL;
+        const clase =
+            Number(registro.Resultado) >= 0
+                ? "positive"
+                : "negative";
 
+        fila.innerHTML = `
 
-    registros.forEach(
-        registro => {
+            <td>${registro.Fecha}</td>
 
-            capital +=
-                Number(
-                    registro.Resultado
-                ) || 0;
+            <td>${registro.Usuario || "Usuario"}</td>
 
+            <td class="${clase}">
+                ${formatearResultado(registro.Resultado)}
+            </td>
 
-            const fila =
-                document.createElement(
-                    "tr"
-                );
+            <td>${registro.Operaciones}</td>
 
+        `;
 
-            const resultado =
-                Number(
-                    registro.Resultado
-                ) || 0;
+        historial.appendChild(fila);
 
-
-            fila.innerHTML = `
-
-                <td>
-                    ${formatearFecha(
-                        registro.Fecha
-                    )}
-                </td>
-
-                <td class="${
-                    resultado >= 0
-                        ? "profit"
-                        : "loss"
-                }">
-
-                    ${formatearDinero(
-                        resultado
-                    )}
-
-                </td>
-
-                <td>
-                    ${registro.Operaciones}
-                </td>
-
-                <td>
-                    ${formatearDinero(
-                        capital
-                    )}
-                </td>
-
-            `;
-
-
-            historial.prepend(
-                fila
-            );
-
-        }
-    );
+    });
 
 }
 
 
 // ==========================================
-// GRÁFICA
+// ESTADÍSTICAS
 // ==========================================
 
-function actualizarGrafica() {
+function actualizarEstadisticas() {
 
-    const canvas =
-        document.getElementById(
-            "capitalChart"
-        );
+    let totalGanancia = 0;
+    let totalOperaciones = 0;
 
+    const dias = new Set();
 
-    if (!canvas) return;
+    registros.forEach(function (registro) {
 
+        totalGanancia +=
+            Number(registro.Resultado) || 0;
 
-    const fechas = [];
+        totalOperaciones +=
+            Number(registro.Operaciones) || 0;
 
-    const capitales = [];
+        if (registro.Fecha) {
 
-
-    let capital =
-        CAPITAL_INICIAL;
-
-
-    fechas.push(
-        "Inicio"
-    );
-
-
-    capitales.push(
-        capital
-    );
-
-
-    registros.forEach(
-        registro => {
-
-            capital +=
-                Number(
-                    registro.Resultado
-                ) || 0;
-
-
-            fechas.push(
-                formatearFecha(
-                    registro.Fecha
-                )
-            );
-
-
-            capitales.push(
-                capital
-            );
+            dias.add(registro.Fecha);
 
         }
-    );
 
+    });
+
+    const gananciaElemento =
+        document.getElementById("gananciaTotal");
+
+    const operacionesElemento =
+        document.getElementById("totalOperaciones");
+
+    const diasElemento =
+        document.getElementById("diasRegistrados");
+
+    if (gananciaElemento) {
+
+        gananciaElemento.textContent =
+            formatearResultado(totalGanancia);
+
+    }
+
+    if (operacionesElemento) {
+
+        operacionesElemento.textContent =
+            totalOperaciones;
+
+    }
+
+    if (diasElemento) {
+
+        diasElemento.textContent =
+            dias.size;
+
+    }
+
+}
+
+
+// ==========================================
+// GRÁFICO
+// ==========================================
+
+function actualizarGrafico() {
+
+    const canvas =
+        document.getElementById("capitalChart");
+
+    if (!canvas) {
+        return;
+    }
+
+    if (typeof Chart === "undefined") {
+
+        console.warn(
+            "Chart.js no está cargado."
+        );
+
+        return;
+    }
+
+    const acumuladoPorFecha = {};
+
+    let acumulado =
+        CAPITAL_INICIAL;
+
+    registros.forEach(function (registro) {
+
+        const fecha =
+            registro.Fecha;
+
+        const resultado =
+            Number(registro.Resultado) || 0;
+
+        acumulado += resultado;
+
+        acumuladoPorFecha[fecha] =
+            acumulado;
+
+    });
+
+    const fechas =
+        Object.keys(acumuladoPorFecha);
+
+    const capitales =
+        fechas.map(function (fecha) {
+
+            return acumuladoPorFecha[fecha];
+
+        });
 
     if (capitalChart) {
 
@@ -759,115 +786,39 @@ function actualizarGrafica() {
 
     }
 
+    capitalChart = new Chart(
+        canvas,
+        {
+            type: "line",
 
-    if (
-        typeof Chart ===
-        "undefined"
-    ) {
+            data: {
 
-        console.error(
-            "Chart.js no está cargado."
-        );
+                labels: fechas,
 
-        return;
+                datasets: [
+                    {
+                        label: "Capital",
 
-    }
+                        data: capitales,
 
+                        tension: 0.3,
 
-    capitalChart =
-        new Chart(
-            canvas,
-            {
-
-                type:
-                    "line",
-
-                data: {
-
-                    labels:
-                        fechas,
-
-                    datasets: [
-
-                        {
-
-                            label:
-                                "Capital USD",
-
-                            data:
-                                capitales,
-
-                            tension:
-                                0.35,
-
-                            fill:
-                                true,
-
-                            pointRadius:
-                                4,
-
-                            pointHoverRadius:
-                                7
-
-                        }
-
-                    ]
-
-                },
-
-
-                options: {
-
-                    responsive:
-                        true,
-
-                    maintainAspectRatio:
-                        false,
-
-
-                    plugins: {
-
-                        legend: {
-
-                            display:
-                                true
-
-                        }
-
-                    },
-
-
-                    scales: {
-
-                        y: {
-
-                            beginAtZero:
-                                false,
-
-                            ticks: {
-
-                                callback:
-                                    function (
-                                        value
-                                    ) {
-
-                                        return (
-                                            "$" +
-                                            value
-                                        );
-
-                                    }
-
-                            }
-
-                        }
-
+                        fill: false
                     }
+                ]
 
-                }
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false
 
             }
-        );
+
+        }
+    );
 
 }
 
@@ -878,315 +829,171 @@ function actualizarGrafica() {
 
 function actualizarCalendario() {
 
-    const contenedor =
-        document.getElementById(
-            "calendarioDias"
-        );
-
+    const calendario =
+        document.getElementById("calendarioDias");
 
     const titulo =
-        document.getElementById(
-            "mesActual"
-        );
+        document.getElementById("mesActual");
 
-
-    if (
-        !contenedor ||
-        !titulo
-    ) {
-
-        console.warn(
-            "No se encontraron los elementos del calendario."
-        );
-
+    if (!calendario || !titulo) {
         return;
-
     }
-
-
-    contenedor.innerHTML =
-        "";
-
 
     const año =
         fechaCalendario.getFullYear();
 
-
     const mes =
         fechaCalendario.getMonth();
 
+    const nombresMeses = [
 
-    const nombreMes =
-        fechaCalendario.toLocaleDateString(
-            "es-CO",
-            {
-                month:
-                    "long",
+        "ENERO",
+        "FEBRERO",
+        "MARZO",
+        "ABRIL",
+        "MAYO",
+        "JUNIO",
+        "JULIO",
+        "AGOSTO",
+        "SEPTIEMBRE",
+        "OCTUBRE",
+        "NOVIEMBRE",
+        "DICIEMBRE"
 
-                year:
-                    "numeric"
-
-            }
-        );
-
+    ];
 
     titulo.textContent =
-        nombreMes.toUpperCase();
+        `${nombresMeses[mes]} ${año}`;
 
+    calendario.innerHTML = "";
 
-    // ======================================
-    // PRIMER DÍA
-    // ======================================
+    const primerDia =
+        new Date(año, mes, 1);
 
-    let primerDia =
-        new Date(
-            año,
-            mes,
-            1
-        ).getDay();
+    let diaSemana =
+        primerDia.getDay();
 
-
-    // Domingo = 0
-    // Lunes = 1
-
-    if (
-        primerDia === 0
-    ) {
-
-        primerDia =
-            6;
-
-    } else {
-
-        primerDia =
-            primerDia - 1;
-
+    if (diaSemana === 0) {
+        diaSemana = 7;
     }
 
-
-    // ======================================
-    // CANTIDAD DE DÍAS
-    // ======================================
-
-    const cantidadDias =
-        new Date(
-            año,
-            mes + 1,
-            0
-        ).getDate();
-
-
-    // ======================================
-    // ESPACIOS ANTES DEL DÍA 1
-    // ======================================
+    const ultimoDia =
+        new Date(año, mes + 1, 0).getDate();
 
     for (
-        let i = 0;
-        i < primerDia;
+        let i = 1;
+        i < diaSemana;
         i++
     ) {
 
         const espacio =
-            document.createElement(
-                "div"
-            );
-
+            document.createElement("div");
 
         espacio.className =
             "calendar-day empty";
 
-
-        contenedor.appendChild(
+        calendario.appendChild(
             espacio
         );
 
     }
 
-
-    // ======================================
-    // CREAR DÍAS
-    // ======================================
-
     for (
         let dia = 1;
-        dia <= cantidadDias;
+        dia <= ultimoDia;
         dia++
     ) {
 
         const elemento =
-            document.createElement(
-                "div"
-            );
-
+            document.createElement("div");
 
         elemento.className =
             "calendar-day";
 
+        const numeroDia =
+            document.createElement("span");
 
-        // NÚMERO DEL DÍA
+        numeroDia.className =
+            "day-number";
 
-        const numero =
-            document.createElement(
-                "div"
-            );
-
-
-        numero.className =
-            "calendar-number";
-
-
-        numero.textContent =
+        numeroDia.textContent =
             dia;
 
-
         elemento.appendChild(
-            numero
+            numeroDia
         );
 
+        const mesTexto =
+            String(mes + 1).padStart(2, "0");
 
-        // FECHA
+        const diaTexto =
+            String(dia).padStart(2, "0");
 
         const fecha =
-            `${año}-${String(
-                mes + 1
-            ).padStart(
-                2,
-                "0"
-            )}-${String(
-                dia
-            ).padStart(
-                2,
-                "0"
-            )}`;
+            `${año}-${mesTexto}-${diaTexto}`;
 
+        let resultadoDia = 0;
+        let operacionesDia = 0;
 
-        // BUSCAR REGISTROS
+        registros.forEach(function (registro) {
 
-        const registrosDia =
-            registros.filter(
-                registro =>
-                    registro.Fecha ===
-                    fecha
-            );
+            if (registro.Fecha === fecha) {
 
+                resultadoDia +=
+                    Number(registro.Resultado) || 0;
 
-        if (
-            registrosDia.length >
-            0
-        ) {
-
-            let resultado =
-                0;
-
-
-            let cantidadOperaciones =
-                0;
-
-
-            registrosDia.forEach(
-                registro => {
-
-                    resultado +=
-                        Number(
-                            registro.Resultado
-                        ) || 0;
-
-
-                    cantidadOperaciones +=
-                        Number(
-                            registro.Operaciones
-                        ) || 0;
-
-                }
-            );
-
-
-            // RESULTADO
-
-            const resultadoElemento =
-                document.createElement(
-                    "div"
-                );
-
-
-            resultadoElemento.className =
-                "calendar-result";
-
-
-            resultadoElemento.textContent =
-                formatearDinero(
-                    resultado
-                );
-
-
-            elemento.appendChild(
-                resultadoElemento
-            );
-
-
-            // OPERACIONES
-
-            elemento.title =
-                `${cantidadOperaciones} operaciones`;
-
-
-            // GANANCIA / PÉRDIDA
-
-            if (
-                resultado > 0
-            ) {
-
-                elemento.classList.add(
-                    "positive"
-                );
-
-            } else if (
-                resultado < 0
-            ) {
-
-                elemento.classList.add(
-                    "negative"
-                );
+                operacionesDia +=
+                    Number(registro.Operaciones) || 0;
 
             }
 
-        }
+        });
 
-
-        // ==================================
-        // MARCAR HOY
-        // ==================================
-
-        const ahora =
-            new Date();
-
-
-        const hoy =
-            `${ahora.getFullYear()}-${String(
-                ahora.getMonth() + 1
-            ).padStart(
-                2,
-                "0"
-            )}-${String(
-                ahora.getDate()
-            ).padStart(
-                2,
-                "0"
-            )}`;
-
-
-        if (
-            fecha === hoy
-        ) {
+        if (resultadoDia > 0) {
 
             elemento.classList.add(
-                "today"
+                "positive"
+            );
+
+        } else if (resultadoDia < 0) {
+
+            elemento.classList.add(
+                "negative"
+            );
+
+        } else {
+
+            elemento.classList.add(
+                "neutral"
             );
 
         }
 
+        if (resultadoDia !== 0) {
 
-        contenedor.appendChild(
+            const resultado =
+                document.createElement("small");
+
+            resultado.textContent =
+                formatearResultado(resultadoDia);
+
+            elemento.appendChild(
+                resultado
+            );
+
+            const operaciones =
+                document.createElement("small");
+
+            operaciones.textContent =
+                `${operacionesDia} ops`;
+
+            elemento.appendChild(
+                operaciones
+            );
+
+        }
+
+        calendario.appendChild(
             elemento
         );
 
@@ -1205,7 +1012,6 @@ function mesAnterior() {
         fechaCalendario.getMonth() - 1
     );
 
-
     actualizarCalendario();
 
 }
@@ -1221,7 +1027,6 @@ function mesSiguiente() {
         fechaCalendario.getMonth() + 1
     );
 
-
     actualizarCalendario();
 
 }
@@ -1235,72 +1040,67 @@ async function borrarHistorial() {
 
     const confirmar =
         confirm(
-            "¿Seguro que quieres borrar TODO el historial?"
+            "¿Seguro que quieres borrar todo el historial?"
         );
 
+    if (!confirmar) {
+        return;
+    }
 
-    if (!confirmar) return;
+    const accessToken =
+        localStorage.getItem("millan_access_token");
 
+    if (!accessToken) {
+
+        mostrarLogin();
+
+        return;
+    }
 
     try {
 
-        const respuesta =
-            await fetch(
-                `${SUPABASE_URL}/rest/v1/operaciones?id=not.is.null`,
-                {
+        const respuesta = await fetch(
+            `${SUPABASE_URL}/rest/v1/operaciones?id=not.is.null`,
+            {
+                method: "DELETE",
 
-                    method:
-                        "DELETE",
-
-                    headers: {
-
-                        "apikey":
-                            SUPABASE_KEY,
-
-                        "Authorization":
-                            `Bearer ${SUPABASE_KEY}`
-
-                    }
-
+                headers: {
+                    "apikey": SUPABASE_KEY,
+                    "Authorization": `Bearer ${accessToken}`
                 }
-            );
-
+            }
+        );
 
         if (!respuesta.ok) {
 
             const error =
                 await respuesta.text();
 
-
             console.error(
-                "ERROR AL BORRAR:",
+                "Error borrando historial:",
                 error
             );
 
-
             alert(
-                "No se pudo borrar el historial."
+                "No se pudo borrar el historial.\n\n" +
+                error
             );
 
-
             return;
-
         }
 
-
         alert(
-            "Historial eliminado."
+            "Historial borrado correctamente."
         );
-
 
         await cargarDatos();
 
-
     } catch (error) {
 
-        console.error(
-            "ERROR:",
-            error
+        console.error("Error:", error);
+
+        alert(
+            "Error de conexión."
         );
 
     }
@@ -1309,84 +1109,20 @@ async function borrarHistorial() {
 
 
 // ==========================================
-// FORMATEAR DINERO
+// FUNCIONES GLOBALES
 // ==========================================
 
-function formatearDinero(valor) {
+window.iniciarSesion =
+    iniciarSesion;
 
-    const numero =
-        Number(valor) || 0;
+window.cerrarSesion =
+    cerrarSesion;
 
+window.registrarResultado =
+    registrarResultado;
 
-    if (
-        numero >= 0
-    ) {
-
-        return (
-            "+$" +
-            numero.toFixed(2)
-        );
-
-    }
-
-
-    return (
-        "-$" +
-        Math.abs(
-            numero
-        ).toFixed(2)
-    );
-
-}
-
-
-// ==========================================
-// FORMATEAR FECHA
-// ==========================================
-
-function formatearFecha(fecha) {
-
-    if (!fecha) return "";
-
-
-    const partes =
-        fecha.split("-");
-
-
-    if (
-        partes.length !== 3
-    ) {
-
-        return fecha;
-
-    }
-
-
-    return (
-        partes[2] +
-        "/" +
-        partes[1] +
-        "/" +
-        partes[0]
-    );
-
-}
-
-
-// ==========================================
-// ACTUALIZACIÓN AUTOMÁTICA
-// ==========================================
-
-setInterval(
-    cargarDatos,
-    5000
-);
-
-
-// ==========================================
-// HACER FUNCIONES DISPONIBLES
-// PARA LOS BOTONES DEL HTML
-// ==========================================
+window.borrarHistorial =
+    borrarHistorial;
 
 window.actualizarCalendario =
     actualizarCalendario;
@@ -1397,9 +1133,26 @@ window.mesAnterior =
 window.mesSiguiente =
     mesSiguiente;
 
-window.registrarResultado =
-    registrarResultado;
 
-window.borrarHistorial =
-    borrarHistorial;
+// ==========================================
+// ACTUALIZACIÓN AUTOMÁTICA
+// ==========================================
+
+setInterval(
+    async function () {
+
+        const token =
+            localStorage.getItem(
+                "millan_access_token"
+            );
+
+        if (token) {
+
+            await cargarDatos();
+
+        }
+
+    },
+    5000
+);
 
