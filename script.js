@@ -19,7 +19,7 @@ async function obtenerHistorial() {
     try {
 
         const respuesta = await fetch(
-            `${SUPABASE_URL}/rest/v1/operaciones?select=*&order=Fecha.desc,id.desc`,
+            `${SUPABASE_URL}/rest/v1/operaciones?select=*&order=Fecha.desc,Id.desc`,
             {
                 method: "GET",
                 headers: headers
@@ -56,7 +56,7 @@ function calcularCapital(historial) {
 
     const resultadoTotal = historial.reduce(
         (total, registro) => {
-            return total + Number(registro.resultado);
+            return total + Number(registro.Resultado);
         },
         0
     );
@@ -154,11 +154,11 @@ async function registrarResultado() {
 
         Fecha: hoy,
 
-        resultado: resultado,
+        Resultado: resultado,
 
-        operaciones: operaciones,
+        Operaciones: operaciones,
 
-        usuario: nombreUsuario
+        Usuario: nombreUsuario
     };
 
 
@@ -185,7 +185,7 @@ async function registrarResultado() {
                 await respuesta.text();
 
             console.error(
-                "Error al guardar:",
+                "ERROR AL GUARDAR EN SUPABASE:",
                 error
             );
 
@@ -238,7 +238,7 @@ async function actualizarPantalla() {
     const resultadoTotal =
         historial.reduce(
             (total, registro) => {
-                return total + Number(registro.resultado);
+                return total + Number(registro.Resultado);
             },
             0
         );
@@ -247,7 +247,7 @@ async function actualizarPantalla() {
     const operacionesTotales =
         historial.reduce(
             (total, registro) => {
-                return total + Number(registro.operaciones);
+                return total + Number(registro.Operaciones);
             },
             0
         );
@@ -314,7 +314,7 @@ function mostrarResultadoHoy(historial) {
     const resultadoHoy =
         registrosHoy.reduce(
             (total, registro) => {
-                return total + Number(registro.resultado);
+                return total + Number(registro.Resultado);
             },
             0
         );
@@ -323,7 +323,7 @@ function mostrarResultadoHoy(historial) {
     const operacionesHoy =
         registrosHoy.reduce(
             (total, registro) => {
-                return total + Number(registro.operaciones);
+                return total + Number(registro.Operaciones);
             },
             0
         );
@@ -404,7 +404,7 @@ function mostrarHistorial(historial) {
     registros.forEach(registro => {
 
         capital +=
-            Number(registro.resultado);
+            Number(registro.Resultado);
 
 
         const fila =
@@ -412,7 +412,7 @@ function mostrarHistorial(historial) {
 
 
         const clase =
-            Number(registro.resultado) >= 0
+            Number(registro.Resultado) >= 0
                 ? "profit"
                 : "loss";
 
@@ -430,11 +430,11 @@ function mostrarHistorial(historial) {
             </td>
 
             <td class="${clase}">
-                ${formatoDinero(registro.resultado)}
+                ${formatoDinero(registro.Resultado)}
             </td>
 
             <td>
-                ${registro.operaciones}
+                ${registro.Operaciones}
             </td>
 
             <td>
@@ -472,7 +472,7 @@ async function borrarHistorial() {
 
         const respuesta =
             await fetch(
-                `${SUPABASE_URL}/rest/v1/operaciones?id=not.is.null`,
+                `${SUPABASE_URL}/rest/v1/operaciones?Id=not.is.null`,
                 {
                     method: "DELETE",
                     headers: headers
@@ -486,7 +486,7 @@ async function borrarHistorial() {
                 await respuesta.text();
 
             console.error(
-                "Error al borrar:",
+                "ERROR AL BORRAR:",
                 error
             );
 
@@ -552,7 +552,7 @@ actualizarPantalla();
 
 
 // ===============================
-// ACTUALIZAR CADA 5 SEGUNDOS
+// ACTUALIZACIÓN AUTOMÁTICA
 // ===============================
 
 setInterval(
