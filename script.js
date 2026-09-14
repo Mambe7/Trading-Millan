@@ -1,158 +1,193 @@
+// ==========================================
+// MILLAN TRADING
+// Sistema de control de operaciones
+// ==========================================
+
+// CONFIGURACIÓN SUPABASE
+
 const SUPABASE_URL = "https://pemasiezuewkboeuudys.supabase.co";
 const SUPABASE_KEY = "sb_publishable_DveagRUAISleOisJ0B9TjA_fXXSyWJs";
 
 const CAPITAL_INICIAL = 540;
 
-const headers = {
-    "apikey": SUPABASE_KEY,
-    "Authorization": `Bearer ${SUPABASE_KEY}`,
-    "Content-Type": "application/json"
-};
+let registros = [];
+let capitalChart = null;
 
 
-// ===============================
-// OBTENER HISTORIAL
-// ===============================
+// ==========================================
+// INICIAR SISTEMA
+// ==========================================
 
-async function obtenerHistorial() {
+document.addEventListener("DOMContentLoaded", () => {
+
+    mostrarFecha();
+
+    cargarDatos();
+
+});
+
+
+// ==========================================
+// FECHA ACTUAL
+// ==========================================
+
+function mostrarFecha() {
+
+    const elementoFecha = document.getElementById("fecha");
+
+    if (!elementoFecha) return;
+
+    const ahora = new Date();
+
+    elementoFecha.textContent = ahora.toLocaleDateString(
+        "es-CO",
+        {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        }
+    );
+
+}
+
+
+// ==========================================
+// CARGAR DATOS DE SUPABASE
+// ==========================================
+
+async function cargarDatos() {
 
     try {
 
         const respuesta = await fetch(
-            `${SUPABASE_URL}/rest/v1/operaciones?select=*&order=Fecha.desc`,
+            `${SUPABASE_URL}/rest/v1/operaciones?select=*&order=Fecha.asc`,
             {
                 method: "GET",
-                headers: headers
+
+                headers: {
+
+                    "apikey": SUPABASE_KEY,
+
+                    "Authorization": `Bearer ${SUPABASE_KEY}`,
+
+                    "Content-Type": "application/json"
+
+                }
             }
         );
+
 
         if (!respuesta.ok) {
 
             const error = await respuesta.text();
 
-            console.error("Error Supabase:", error);
+            console.error("ERROR SUPABASE:", error);
 
-            throw new Error("No se pudo obtener el historial");
+            return;
+
         }
 
-        return await respuesta.json();
+
+        registros = await respuesta.json();
+
+        console.log("REGISTROS CARGADOS:", registros);
+
+
+        actualizarPanel();
+
+        actualizarHistorial();
+
+        actualizarGrafica();
+
 
     } catch (error) {
 
-        console.error(error);
-
-        alert("No se pudo conectar con la base de datos.");
-
-        return [];
-    }
-}
-
-
-// ===============================
-// CALCULAR CAPITAL
-// ===============================
-
-function calcularCapital(historial) {
-
-    const resultadoTotal = historial.reduce(
-        (total, registro) => {
-            return total + Number(registro.Resultado);
-        },
-        0
-    );
-
-    return CAPITAL_INICIAL + resultadoTotal;
-}
-
-
-// ===============================
-// FORMATO DINERO
-// ===============================
-
-function formatoDinero(numero) {
-
-    numero = Number(numero);
-
-    if (numero >= 0) {
-
-        return "+$" + numero.toFixed(2);
+        console.error(
+            "ERROR AL CARGAR DATOS:",
+            error
+        );
 
     }
 
-    return "-$" + Math.abs(numero).toFixed(2);
 }
 
 
-// ===============================
+// ==========================================
 // REGISTRAR RESULTADO
-// ===============================
+// ==========================================
 
 async function registrarResultado() {
 
-    const resultadoInput =
+    const campoGanancia =
         document.getElementById("ganancia");
 
-    const operacionesInput =
+    const campoOperaciones =
         document.getElementById("numeroOperaciones");
 
 
     const resultado =
-        parseFloat(resultadoInput.value);
+        parseFloat(campoGanancia.value);
 
     const operaciones =
-        parseInt(operacionesInput.value);
+        parseInt(campoOperaciones.value);
 
 
     if (isNaN(resultado)) {
 
-        alert("Ingresa el resultado del día.");
+        alert(
+            "Ingresa el resultado del día."
+        );
 
         return;
+
     }
 
 
-    if (isNaN(operaciones) || operaciones < 0) {
+    if (isNaN(operaciones)) {
 
-        alert("Ingresa un número válido de operaciones.");
+        alert(
+            "Ingresa el número de operaciones."
+        );
 
         return;
+
     }
 
 
-    const usuario =
+    let nombreUsuario =
         prompt(
             "¿Quién está registrando el resultado?\n\n1 = Juan Millan Grisales\n2 = Edilberto Millan"
         );
 
 
-    let nombreUsuario;
+    if (nombreUsuario === "1") {
 
+        nombreUsuario =
+            "JUAN MILLAN GRISALES";
 
-    if (usuario === "1") {
+    } else if (nombreUsuario === "2") {
 
-        nombreUsuario = "Juan Millan Grisales";
-
-    } else if (usuario === "2") {
-
-        nombreUsuario = "Edilberto Millan";
+        nombreUsuario =
+            "EDILBERTO MILLAN";
 
     } else {
 
-        alert("Usuario no válido.");
+        alert(
+            "Usuario no válido."
+        );
 
         return;
+
     }
 
 
+    const ahora = new Date();
+
+
     const hoy =
-        new Date()
-            .toISOString()
-            .split("T")[0];
+        ahora.toISOString().split("T")[0];
 
-
-    // IMPORTANTE:
-    // Estos nombres coinciden EXACTAMENTE
-    // con las columnas de Supabase.
 
     const nuevoRegistro = {
 
@@ -163,6 +198,7 @@ async function registrarResultado() {
         Operaciones: operaciones,
 
         Usuario: nombreUsuario
+
     };
 
 
@@ -177,14 +213,29 @@ async function registrarResultado() {
         const respuesta = await fetch(
             `${SUPABASE_URL}/rest/v1/operaciones`,
             {
+
                 method: "POST",
 
                 headers: {
-                    ...headers,
-                    "Prefer": "return=representation"
+
+                    "apikey": SUPABASE_KEY,
+
+                    "Authorization":
+                        `Bearer ${SUPABASE_KEY}`,
+
+                    "Content-Type":
+                        "application/json",
+
+                    "Prefer":
+                        "return=representation"
+
                 },
 
-                body: JSON.stringify(nuevoRegistro)
+                body:
+                    JSON.stringify(
+                        nuevoRegistro
+                    )
+
             }
         );
 
@@ -195,7 +246,7 @@ async function registrarResultado() {
                 await respuesta.text();
 
             console.error(
-                "ERROR AL GUARDAR EN SUPABASE:",
+                "ERROR AL GUARDAR:",
                 error
             );
 
@@ -204,6 +255,7 @@ async function registrarResultado() {
             );
 
             return;
+
         }
 
 
@@ -217,105 +269,75 @@ async function registrarResultado() {
         );
 
 
-        resultadoInput.value = "";
-
-        operacionesInput.value = "";
-
-
         alert(
             "Resultado registrado correctamente."
         );
 
 
-        actualizarPantalla();
+        campoGanancia.value = "";
+
+        campoOperaciones.value = "";
+
+
+        await cargarDatos();
 
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            "ERROR:",
+            error
+        );
 
         alert(
-            "Error de conexión con Supabase."
+            "Ocurrió un error al registrar."
         );
+
     }
+
 }
 
 
-// ===============================
-// ACTUALIZAR PANTALLA
-// ===============================
+// ==========================================
+// ACTUALIZAR PANEL
+// ==========================================
 
-async function actualizarPantalla() {
+function actualizarPanel() {
 
-    const historial =
-        await obtenerHistorial();
+    let gananciaTotal = 0;
+
+    let operacionesTotales = 0;
+
+
+    registros.forEach(
+        registro => {
+
+            gananciaTotal +=
+                Number(
+                    registro.Resultado
+                ) || 0;
+
+
+            operacionesTotales +=
+                Number(
+                    registro.Operaciones
+                ) || 0;
+
+        }
+    );
 
 
     const capitalActual =
-        calcularCapital(historial);
-
-
-    const resultadoTotal =
-        historial.reduce(
-            (total, registro) => {
-                return total + Number(registro.Resultado);
-            },
-            0
-        );
-
-
-    const operacionesTotales =
-        historial.reduce(
-            (total, registro) => {
-                return total + Number(registro.Operaciones);
-            },
-            0
-        );
+        CAPITAL_INICIAL +
+        gananciaTotal;
 
 
     const rentabilidad =
         (
-            (capitalActual - CAPITAL_INICIAL)
-            / CAPITAL_INICIAL
+            gananciaTotal /
+            CAPITAL_INICIAL
         ) * 100;
 
-
-    document.getElementById("capital")
-        .textContent =
-        "$" + capitalActual.toFixed(2);
-
-
-    document.getElementById("gananciaTotal")
-        .textContent =
-        formatoDinero(resultadoTotal);
-
-
-    document.getElementById("totalOperaciones")
-        .textContent =
-        operacionesTotales;
-
-
-    document.getElementById("diasRegistrados")
-        .textContent =
-        historial.length;
-
-
-    document.getElementById("rentabilidad")
-        .textContent =
-        rentabilidad.toFixed(2) + "%";
-
-
-    mostrarResultadoHoy(historial);
-
-    mostrarHistorial(historial);
-}
-
-
-// ===============================
-// RESULTADO DE HOY
-// ===============================
-
-function mostrarResultadoHoy(historial) {
 
     const hoy =
         new Date()
@@ -323,156 +345,360 @@ function mostrarResultadoHoy(historial) {
             .split("T")[0];
 
 
-    const registrosHoy =
-        historial.filter(
-            registro => {
-                return registro.Fecha === hoy;
+    let resultadoHoy = 0;
+
+    let operacionesHoy = 0;
+
+
+    registros.forEach(
+        registro => {
+
+            if (
+                registro.Fecha === hoy
+            ) {
+
+                resultadoHoy +=
+                    Number(
+                        registro.Resultado
+                    ) || 0;
+
+
+                operacionesHoy +=
+                    Number(
+                        registro.Operaciones
+                    ) || 0;
+
             }
+
+        }
+    );
+
+
+    document.getElementById(
+        "capital"
+    ).textContent =
+        formatearDinero(
+            capitalActual
         );
 
 
-    const resultadoHoy =
-        registrosHoy.reduce(
-            (total, registro) => {
-                return total + Number(registro.Resultado);
-            },
-            0
+    document.getElementById(
+        "resultado"
+    ).textContent =
+        formatearDinero(
+            resultadoHoy
         );
 
 
-    const operacionesHoy =
-        registrosHoy.reduce(
-            (total, registro) => {
-                return total + Number(registro.Operaciones);
-            },
-            0
-        );
-
-
-    const elemento =
-        document.getElementById("resultado");
-
-
-    elemento.textContent =
-        formatoDinero(resultadoHoy);
-
-
-    document.getElementById("operaciones")
-        .textContent =
+    document.getElementById(
+        "operaciones"
+    ).textContent =
         operacionesHoy;
 
 
-    const texto =
-        document.getElementById("resultadoTexto");
+    document.getElementById(
+        "rentabilidad"
+    ).textContent =
+        rentabilidad.toFixed(2) + "%";
+
+
+    document.getElementById(
+        "gananciaTotal"
+    ).textContent =
+        formatearDinero(
+            gananciaTotal
+        );
+
+
+    document.getElementById(
+        "totalOperaciones"
+    ).textContent =
+        operacionesTotales;
+
+
+    const diasUnicos =
+        new Set(
+            registros.map(
+                registro =>
+                    registro.Fecha
+            )
+        );
+
+
+    document.getElementById(
+        "diasRegistrados"
+    ).textContent =
+        diasUnicos.size;
+
+
+    const resultadoTexto =
+        document.getElementById(
+            "resultadoTexto"
+        );
 
 
     if (resultadoHoy > 0) {
 
-        elemento.className = "profit";
+        resultadoTexto.textContent =
+            "Día positivo 📈";
 
-        texto.textContent =
-            "Ganancia del día";
+    } else if (resultadoHoy < 0) {
 
-        texto.className = "profit";
+        resultadoTexto.textContent =
+            "Día negativo 📉";
 
-    }
+    } else {
 
-    else if (resultadoHoy < 0) {
-
-        elemento.className = "loss";
-
-        texto.textContent =
-            "Pérdida del día";
-
-        texto.className = "loss";
+        resultadoTexto.textContent =
+            "Sin operaciones";
 
     }
 
-    else {
-
-        elemento.className = "";
-
-        texto.textContent =
-            "Sin resultado";
-
-        texto.className = "";
-    }
 }
 
 
-// ===============================
-// MOSTRAR HISTORIAL
-// ===============================
+// ==========================================
+// HISTORIAL
+// ==========================================
 
-function mostrarHistorial(historial) {
+function actualizarHistorial() {
 
-    const tabla =
-        document.getElementById("historial");
+    const historial =
+        document.getElementById(
+            "historial"
+        );
 
 
-    tabla.innerHTML = "";
+    historial.innerHTML = "";
 
 
     let capital =
         CAPITAL_INICIAL;
 
 
-    const registros =
-        [...historial].reverse();
+    registros.forEach(
+        registro => {
+
+            capital +=
+                Number(
+                    registro.Resultado
+                ) || 0;
 
 
-    registros.forEach(registro => {
-
-        capital +=
-            Number(registro.Resultado);
-
-
-        const fila =
-            document.createElement("tr");
+            const fila =
+                document.createElement(
+                    "tr"
+                );
 
 
-        const clase =
-            Number(registro.Resultado) >= 0
-                ? "profit"
-                : "loss";
+            const resultado =
+                Number(
+                    registro.Resultado
+                ) || 0;
 
 
-        const fecha =
-            new Date(
-                registro.Fecha + "T00:00:00"
-            ).toLocaleDateString("es-CO");
+            fila.innerHTML = `
+
+                <td>
+                    ${formatearFecha(
+                        registro.Fecha
+                    )}
+                </td>
+
+                <td class="${
+                    resultado >= 0
+                        ? "positivo"
+                        : "negativo"
+                }">
+
+                    ${formatearDinero(
+                        resultado
+                    )}
+
+                </td>
+
+                <td>
+                    ${registro.Operaciones}
+                </td>
+
+                <td>
+                    ${formatearDinero(
+                        capital
+                    )}
+                </td>
+
+            `;
 
 
-        fila.innerHTML = `
+            historial.prepend(fila);
 
-            <td>
-                ${fecha}
-            </td>
+        }
+    );
 
-            <td class="${clase}">
-                ${formatoDinero(registro.Resultado)}
-            </td>
-
-            <td>
-                ${registro.Operaciones}
-            </td>
-
-            <td>
-                $${capital.toFixed(2)}
-            </td>
-
-        `;
-
-
-        tabla.appendChild(fila);
-
-    });
 }
 
 
-// ===============================
+// ==========================================
+// GRÁFICA
+// ==========================================
+
+function actualizarGrafica() {
+
+    const canvas =
+        document.getElementById(
+            "capitalChart"
+        );
+
+
+    if (!canvas) return;
+
+
+    const fechas = [];
+
+    const capitales = [];
+
+
+    let capital =
+        CAPITAL_INICIAL;
+
+
+    // Capital inicial
+
+    fechas.push(
+        "Inicio"
+    );
+
+    capitales.push(
+        capital
+    );
+
+
+    registros.forEach(
+        registro => {
+
+            capital +=
+                Number(
+                    registro.Resultado
+                ) || 0;
+
+
+            fechas.push(
+                formatearFecha(
+                    registro.Fecha
+                )
+            );
+
+
+            capitales.push(
+                capital
+            );
+
+        }
+    );
+
+
+    if (capitalChart) {
+
+        capitalChart.destroy();
+
+    }
+
+
+    capitalChart =
+        new Chart(
+            canvas,
+            {
+
+                type: "line",
+
+                data: {
+
+                    labels: fechas,
+
+                    datasets: [
+
+                        {
+
+                            label:
+                                "Capital USD",
+
+                            data:
+                                capitales,
+
+                            tension:
+                                0.35,
+
+                            fill:
+                                true,
+
+                            pointRadius:
+                                4,
+
+                            pointHoverRadius:
+                                7
+
+                        }
+
+                    ]
+
+                },
+
+
+                options: {
+
+                    responsive:
+                        true,
+
+                    maintainAspectRatio:
+                        false,
+
+
+                    plugins: {
+
+                        legend: {
+
+                            display:
+                                true
+
+                        }
+
+                    },
+
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero:
+                                false,
+
+                            ticks: {
+
+                                callback:
+                                    function(value) {
+
+                                        return "$" +
+                                            value;
+
+                                    }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+        );
+
+}
+
+
+// ==========================================
 // BORRAR HISTORIAL
-// ===============================
+// ==========================================
 
 async function borrarHistorial() {
 
@@ -482,10 +708,7 @@ async function borrarHistorial() {
         );
 
 
-    if (!confirmar) {
-
-        return;
-    }
+    if (!confirmar) return;
 
 
     try {
@@ -494,8 +717,19 @@ async function borrarHistorial() {
             await fetch(
                 `${SUPABASE_URL}/rest/v1/operaciones?id=not.is.null`,
                 {
+
                     method: "DELETE",
-                    headers: headers
+
+                    headers: {
+
+                        "apikey":
+                            SUPABASE_KEY,
+
+                        "Authorization":
+                            `Bearer ${SUPABASE_KEY}`
+
+                    }
+
                 }
             );
 
@@ -515,68 +749,91 @@ async function borrarHistorial() {
             );
 
             return;
+
         }
 
 
         alert(
-            "Historial borrado correctamente."
+            "Historial eliminado."
         );
 
 
-        actualizarPantalla();
+        await cargarDatos();
 
 
     } catch (error) {
 
-        console.error(error);
-
-        alert(
-            "Error de conexión."
+        console.error(
+            "ERROR:",
+            error
         );
+
     }
+
 }
 
 
-// ===============================
-// MOSTRAR FECHA
-// ===============================
+// ==========================================
+// FUNCIONES AUXILIARES
+// ==========================================
 
-function mostrarFecha() {
+function formatearDinero(valor) {
 
-    const fecha =
-        new Date();
+    const numero =
+        Number(valor) || 0;
 
 
-    document.getElementById("fecha")
-        .textContent =
-        fecha.toLocaleDateString(
-            "es-CO",
-            {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric"
-            }
-        )
-        .toUpperCase();
+    if (numero >= 0) {
+
+        return (
+            "+$" +
+            numero.toFixed(2)
+        );
+
+    }
+
+
+    return (
+        "-$" +
+        Math.abs(numero).toFixed(2)
+    );
+
 }
 
 
-// ===============================
-// INICIAR APP
-// ===============================
+function formatearFecha(fecha) {
 
-mostrarFecha();
-
-actualizarPantalla();
+    if (!fecha) return "";
 
 
-// ===============================
+    const partes =
+        fecha.split("-");
+
+
+    if (partes.length !== 3) {
+
+        return fecha;
+
+    }
+
+
+    return (
+        partes[2] +
+        "/" +
+        partes[1] +
+        "/" +
+        partes[0]
+    );
+
+}
+
+
+// ==========================================
 // ACTUALIZACIÓN AUTOMÁTICA
-// ===============================
+// ==========================================
 
 setInterval(
-    actualizarPantalla,
+    cargarDatos,
     5000
 );
 
