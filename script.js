@@ -3,15 +3,27 @@
 // Sistema de control de operaciones
 // ==========================================
 
+
+// ==========================================
 // CONFIGURACIÓN SUPABASE
+// ==========================================
 
 const SUPABASE_URL = "https://pemasiezuewkboeuudys.supabase.co";
+
 const SUPABASE_KEY = "sb_publishable_DveagRUAISleOisJ0B9TjA_fXXSyWJs";
 
 const CAPITAL_INICIAL = 540;
 
+
+// ==========================================
+// VARIABLES GLOBALES
+// ==========================================
+
 let registros = [];
+
 let capitalChart = null;
+
+let fechaCalendario = new Date();
 
 
 // ==========================================
@@ -33,22 +45,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function mostrarFecha() {
 
-    const elementoFecha = document.getElementById("fecha");
+    const elementoFecha =
+        document.getElementById("fecha");
 
     if (!elementoFecha) return;
 
     const ahora = new Date();
 
-    elementoFecha.textContent = ahora.toLocaleDateString(
-        "es-CO",
-        {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric"
-        }
-    );
-
+    elementoFecha.textContent =
+        ahora.toLocaleDateString(
+            "es-CO",
+            {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
+        );
 }
 
 
@@ -69,9 +82,11 @@ async function cargarDatos() {
 
                     "apikey": SUPABASE_KEY,
 
-                    "Authorization": `Bearer ${SUPABASE_KEY}`,
+                    "Authorization":
+                        `Bearer ${SUPABASE_KEY}`,
 
-                    "Content-Type": "application/json"
+                    "Content-Type":
+                        "application/json"
 
                 }
             }
@@ -80,25 +95,38 @@ async function cargarDatos() {
 
         if (!respuesta.ok) {
 
-            const error = await respuesta.text();
+            const error =
+                await respuesta.text();
 
-            console.error("ERROR SUPABASE:", error);
+            console.error(
+                "ERROR SUPABASE:",
+                error
+            );
 
             return;
 
         }
 
 
-        registros = await respuesta.json();
+        registros =
+            await respuesta.json();
 
-        console.log("REGISTROS CARGADOS:", registros);
 
+        console.log(
+            "REGISTROS CARGADOS:",
+            registros
+        );
+
+
+        // Actualizar toda la interfaz
 
         actualizarPanel();
 
         actualizarHistorial();
 
         actualizarGrafica();
+
+        actualizarCalendario();
 
 
     } catch (error) {
@@ -120,17 +148,25 @@ async function cargarDatos() {
 async function registrarResultado() {
 
     const campoGanancia =
-        document.getElementById("ganancia");
+        document.getElementById(
+            "ganancia"
+        );
 
     const campoOperaciones =
-        document.getElementById("numeroOperaciones");
+        document.getElementById(
+            "numeroOperaciones"
+        );
 
 
     const resultado =
-        parseFloat(campoGanancia.value);
+        parseFloat(
+            campoGanancia.value
+        );
 
     const operaciones =
-        parseInt(campoOperaciones.value);
+        parseInt(
+            campoOperaciones.value
+        );
 
 
     if (isNaN(resultado)) {
@@ -182,11 +218,14 @@ async function registrarResultado() {
     }
 
 
-    const ahora = new Date();
+    const ahora =
+        new Date();
 
 
     const hoy =
-        ahora.toISOString().split("T")[0];
+        ahora
+            .toISOString()
+            .split("T")[0];
 
 
     const nuevoRegistro = {
@@ -210,34 +249,36 @@ async function registrarResultado() {
 
     try {
 
-        const respuesta = await fetch(
-            `${SUPABASE_URL}/rest/v1/operaciones`,
-            {
+        const respuesta =
+            await fetch(
+                `${SUPABASE_URL}/rest/v1/operaciones`,
+                {
 
-                method: "POST",
+                    method: "POST",
 
-                headers: {
+                    headers: {
 
-                    "apikey": SUPABASE_KEY,
+                        "apikey":
+                            SUPABASE_KEY,
 
-                    "Authorization":
-                        `Bearer ${SUPABASE_KEY}`,
+                        "Authorization":
+                            `Bearer ${SUPABASE_KEY}`,
 
-                    "Content-Type":
-                        "application/json",
+                        "Content-Type":
+                            "application/json",
 
-                    "Prefer":
-                        "return=representation"
+                        "Prefer":
+                            "return=representation"
 
-                },
+                    },
 
-                body:
-                    JSON.stringify(
-                        nuevoRegistro
-                    )
+                    body:
+                        JSON.stringify(
+                            nuevoRegistro
+                        )
 
-            }
-        );
+                }
+            );
 
 
         if (!respuesta.ok) {
@@ -399,7 +440,8 @@ function actualizarPanel() {
     document.getElementById(
         "rentabilidad"
     ).textContent =
-        rentabilidad.toFixed(2) + "%";
+        rentabilidad.toFixed(2) +
+        "%";
 
 
     document.getElementById(
@@ -437,6 +479,9 @@ function actualizarPanel() {
         );
 
 
+    if (!resultadoTexto) return;
+
+
     if (resultadoHoy > 0) {
 
         resultadoTexto.textContent =
@@ -467,6 +512,9 @@ function actualizarHistorial() {
         document.getElementById(
             "historial"
         );
+
+
+    if (!historial) return;
 
 
     historial.innerHTML = "";
@@ -507,8 +555,8 @@ function actualizarHistorial() {
 
                 <td class="${
                     resultado >= 0
-                        ? "positivo"
-                        : "negativo"
+                        ? "profit"
+                        : "loss"
                 }">
 
                     ${formatearDinero(
@@ -530,7 +578,9 @@ function actualizarHistorial() {
             `;
 
 
-            historial.prepend(fila);
+            historial.prepend(
+                fila
+            );
 
         }
     );
@@ -561,8 +611,6 @@ function actualizarGrafica() {
     let capital =
         CAPITAL_INICIAL;
 
-
-    // Capital inicial
 
     fechas.push(
         "Inicio"
@@ -600,6 +648,17 @@ function actualizarGrafica() {
     if (capitalChart) {
 
         capitalChart.destroy();
+
+    }
+
+
+    if (typeof Chart === "undefined") {
+
+        console.error(
+            "Chart.js no está cargado."
+        );
+
+        return;
 
     }
 
@@ -692,6 +751,369 @@ function actualizarGrafica() {
 
             }
         );
+
+}
+
+
+// ==========================================
+// CALENDARIO
+// ==========================================
+
+function actualizarCalendario() {
+
+    const contenedor =
+        document.getElementById(
+            "calendarioDias"
+        );
+
+
+    const titulo =
+        document.getElementById(
+            "mesActual"
+        );
+
+
+    if (!contenedor || !titulo) {
+
+        console.warn(
+            "No se encontraron los elementos del calendario."
+        );
+
+        return;
+
+    }
+
+
+    // Limpiar calendario
+
+    contenedor.innerHTML = "";
+
+
+    const año =
+        fechaCalendario.getFullYear();
+
+
+    const mes =
+        fechaCalendario.getMonth();
+
+
+    // Nombre del mes
+
+    const nombreMes =
+        fechaCalendario.toLocaleDateString(
+            "es-CO",
+            {
+                month: "long",
+                year: "numeric"
+            }
+        );
+
+
+    titulo.textContent =
+        nombreMes.toUpperCase();
+
+
+    // ======================================
+    // PRIMER DÍA DEL MES
+    // ======================================
+
+    let primerDia =
+        new Date(
+            año,
+            mes,
+            1
+        ).getDay();
+
+
+    // JavaScript:
+    // Domingo = 0
+    // Lunes = 1
+    // ...
+    //
+    // Nuestro calendario empieza en LUNES
+
+    if (primerDia === 0) {
+
+        primerDia = 6;
+
+    } else {
+
+        primerDia =
+            primerDia - 1;
+
+    }
+
+
+    // ======================================
+    // CANTIDAD DE DIAS
+    // ======================================
+
+    const cantidadDias =
+        new Date(
+            año,
+            mes + 1,
+            0
+        ).getDate();
+
+
+    // ======================================
+    // ESPACIOS ANTES DEL DIA 1
+    // ======================================
+
+    for (
+        let i = 0;
+        i < primerDia;
+        i++
+    ) {
+
+        const espacio =
+            document.createElement(
+                "div"
+            );
+
+
+        espacio.className =
+            "calendar-day empty";
+
+
+        contenedor.appendChild(
+            espacio
+        );
+
+    }
+
+
+    // ======================================
+    // CREAR TODOS LOS DIAS
+    // ======================================
+
+    for (
+        let dia = 1;
+        dia <= cantidadDias;
+        dia++
+    ) {
+
+        const elemento =
+            document.createElement(
+                "div"
+            );
+
+
+        elemento.className =
+            "calendar-day";
+
+
+        // ==================================
+        // NUMERO DEL DIA
+        // ==================================
+
+        const numero =
+            document.createElement(
+                "div"
+            );
+
+
+        numero.className =
+            "calendar-number";
+
+
+        numero.textContent =
+            dia;
+
+
+        elemento.appendChild(
+            numero
+        );
+
+
+        // ==================================
+        // FECHA COMPLETA
+        // ==================================
+
+        const fecha =
+            `${año}-${String(
+                mes + 1
+            ).padStart(
+                2,
+                "0"
+            )}-${String(
+                dia
+            ).padStart(
+                2,
+                "0"
+            )}`;
+
+
+        // ==================================
+        // BUSCAR OPERACIONES DEL DIA
+        // ==================================
+
+        const registrosDia =
+            registros.filter(
+                registro =>
+                    registro.Fecha === fecha
+            );
+
+
+        if (
+            registrosDia.length > 0
+        ) {
+
+            let resultado = 0;
+
+            let cantidadOperaciones = 0;
+
+
+            registrosDia.forEach(
+                registro => {
+
+                    resultado +=
+                        Number(
+                            registro.Resultado
+                        ) || 0;
+
+
+                    cantidadOperaciones +=
+                        Number(
+                            registro.Operaciones
+                        ) || 0;
+
+                }
+            );
+
+
+            // ==============================
+            // MOSTRAR RESULTADO
+            // ==============================
+
+            const resultadoElemento =
+                document.createElement(
+                    "div"
+                );
+
+
+            resultadoElemento.className =
+                "calendar-result";
+
+
+            resultadoElemento.textContent =
+                formatearDinero(
+                    resultado
+                );
+
+
+            elemento.appendChild(
+                resultadoElemento
+            );
+
+
+            // ==============================
+            // INFORMACIÓN AL PASAR EL MOUSE
+            // ==============================
+
+            elemento.title =
+                `${cantidadOperaciones} operaciones`;
+
+
+            // ==============================
+            // COLOR GANANCIA / PERDIDA
+            // ==============================
+
+            if (
+                resultado > 0
+            ) {
+
+                elemento.classList.add(
+                    "positive"
+                );
+
+            } else if (
+                resultado < 0
+            ) {
+
+                elemento.classList.add(
+                    "negative"
+                );
+
+            }
+
+        }
+
+
+        // ==================================
+        // MARCAR DIA ACTUAL
+        // ==================================
+
+        const ahora =
+            new Date();
+
+
+        const hoy =
+            `${ahora.getFullYear()}-${String(
+                ahora.getMonth() + 1
+            ).padStart(
+                2,
+                "0"
+            )}-${String(
+                ahora.getDate()
+            ).padStart(
+                2,
+                "0"
+            )}`;
+
+
+        if (
+            fecha === hoy
+        ) {
+
+            elemento.classList.add(
+                "today"
+            );
+
+        }
+
+
+        // ==================================
+        // AGREGAR DIA AL CALENDARIO
+        // ==================================
+
+        contenedor.appendChild(
+            elemento
+        );
+
+    }
+
+}
+
+
+// ==========================================
+// MES ANTERIOR
+// ==========================================
+
+function mesAnterior() {
+
+    fechaCalendario.setMonth(
+        fechaCalendario.getMonth() - 1
+    );
+
+
+    actualizarCalendario();
+
+}
+
+
+// ==========================================
+// MES SIGUIENTE
+// ==========================================
+
+function mesSiguiente() {
+
+    fechaCalendario.setMonth(
+        fechaCalendario.getMonth() + 1
+    );
+
+
+    actualizarCalendario();
 
 }
 
@@ -795,11 +1217,17 @@ function formatearDinero(valor) {
 
     return (
         "-$" +
-        Math.abs(numero).toFixed(2)
+        Math.abs(
+            numero
+        ).toFixed(2)
     );
 
 }
 
+
+// ==========================================
+// FORMATEAR FECHA
+// ==========================================
 
 function formatearFecha(fecha) {
 
@@ -810,7 +1238,9 @@ function formatearFecha(fecha) {
         fecha.split("-");
 
 
-    if (partes.length !== 3) {
+    if (
+        partes.length !== 3
+    ) {
 
         return fecha;
 
