@@ -1,468 +1,686 @@
 <!DOCTYPE html>
-
 <html lang="es">
 
 <head>
 
-```
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<meta
-    name="theme-color"
-    content="#050505"
->
+    <meta
+        name="theme-color"
+        content="#050505"
+    >
 
-<title>MILLAN TRADING</title>
+    <title>MILLAN TRADING</title>
 
-<link
-    rel="stylesheet"
-    href="style.css"
->
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
-<!-- Chart.js -->
-<script
-    src="https://cdn.jsdelivr.net/npm/chart.js"
-></script>
-```
+    <!-- Chart.js -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js"
+    ></script>
 
 </head>
 
 <body>
 
-```
-<!-- ======================================
-     PANTALLA DE LOGIN
-======================================= -->
+    <!-- ======================================
+         PANTALLA DE LOGIN
+    ======================================= -->
 
-<div
-    id="loginScreen"
-    class="login-screen"
->
+    <div
+        id="loginScreen"
+        class="login-screen"
+    >
 
-    <div class="login-box">
+        <div class="login-box">
 
-        <div class="login-logo">
+            <div class="login-logo">
 
-            <h1>
-                ⚡ MILLAN TRADING
-            </h1>
+                <h1>
+                    ⚡ MILLAN TRADING
+                </h1>
 
-            <span>
-                SISTEMA DE TRADING
-            </span>
+                <span>
+                    SISTEMA DE TRADING
+                </span>
 
-        </div>
+            </div>
 
+            <div class="login-line"></div>
 
-        <div class="login-line"></div>
+            <p class="login-title">
+                ACCESO AL SISTEMA
+            </p>
 
+            <div class="input-box">
 
-        <p class="login-title">
-            ACCESO AL SISTEMA
-        </p>
+                <label for="loginEmail">
+                    CORREO ELECTRÓNICO
+                </label>
 
+                <input
+                    type="email"
+                    id="loginEmail"
+                    placeholder="Ingresa tu correo"
+                    autocomplete="email"
+                >
 
-        <div class="input-box">
+            </div>
 
-            <label for="loginEmail">
-                CORREO ELECTRÓNICO
-            </label>
+            <div class="input-box">
 
-            <input
-                type="email"
-                id="loginEmail"
-                placeholder="Ingresa tu correo"
-                autocomplete="email"
+                <label for="loginPassword">
+                    CONTRASEÑA
+                </label>
+
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="Ingresa tu contraseña"
+                    autocomplete="current-password"
+                >
+
+            </div>
+
+            <button
+                type="button"
+                onclick="iniciarSesion()"
             >
+                ⚡ ENTRAR
+            </button>
 
-        </div>
+            <p
+                id="loginMessage"
+                class="login-message"
+            ></p>
 
+            <div class="login-status">
 
-        <div class="input-box">
+                <span class="dot"></span>
 
-            <label for="loginPassword">
-                CONTRASEÑA
-            </label>
+                SISTEMA SEGURO
 
-            <input
-                type="password"
-                id="loginPassword"
-                placeholder="Ingresa tu contraseña"
-                autocomplete="current-password"
-            >
-
-        </div>
-
-
-        <button
-            type="button"
-            onclick="iniciarSesion()"
-        >
-            ⚡ ENTRAR
-        </button>
-
-
-        <p
-            id="loginMessage"
-            class="login-message"
-        ></p>
-
-
-        <div class="login-status">
-
-            <span class="dot"></span>
-
-            SISTEMA SEGURO
+            </div>
 
         </div>
 
     </div>
 
-</div>
+
+    <!-- ======================================
+         APLICACIÓN PRINCIPAL
+    ======================================= -->
+
+    <div
+        id="app"
+        style="display: none;"
+    >
+
+        <div class="grid-background"></div>
 
 
-<!-- ======================================
-     APLICACIÓN PRINCIPAL
-======================================= -->
+        <!-- ==================================
+             HEADER
+        =================================== -->
 
-<div
-    id="app"
-    style="display: none;"
->
-
-    <div class="grid-background"></div>
-
-
-    <!-- ==================================
-         HEADER
-    =================================== -->
-
-    <header class="topbar">
-
-        <div>
-
-            <h1>
-                ⚡ MILLAN TRADING
-            </h1>
-
-
-            <span class="status">
-
-                <span class="dot"></span>
-
-                SISTEMA ONLINE
-
-            </span>
-
-        </div>
-
-
-        <div class="users">
+        <header class="topbar">
 
             <div>
 
-                <strong>
-                    JUAN MILLAN GRISALES
-                </strong>
+                <h1>
+                    ⚡ MILLAN TRADING
+                </h1>
 
-                <small>
-                    TRADER
-                </small>
+                <span class="status">
 
-            </div>
+                    <span class="dot"></span>
 
+                    SISTEMA ONLINE
 
-            <div>
-
-                <strong>
-                    EDILBERTO MILLAN
-                </strong>
-
-                <small>
-                    TRADER
-                </small>
-
-            </div>
-
-
-            <button
-                class="secondary logout-button"
-                onclick="cerrarSesion()"
-            >
-                CERRAR SESIÓN
-            </button>
-
-        </div>
-
-    </header>
-
-
-    <!-- ==================================
-         CONTENIDO
-    =================================== -->
-
-    <main class="container">
-
-
-        <!-- BIENVENIDA -->
-
-        <section class="welcome">
-
-            <p>
-                /// TRADING CONTROL SYSTEM
-            </p>
-
-
-            <h2>
-                Panel de control
-            </h2>
-
-
-            <span id="fecha"></span>
-
-        </section>
-
-
-        <!-- TARJETAS -->
-
-        <section class="cards">
-
-
-            <div class="card capital">
-
-                <span>
-                    CAPITAL ACTUAL
                 </span>
 
-
-                <h3 id="capital">
-                    $540.00
-                </h3>
-
-
-                <small>
-                    USD
-                </small>
-
             </div>
 
 
-            <div class="card">
-
-                <span>
-                    RESULTADO DE HOY
-                </span>
-
-
-                <h3 id="resultado">
-                    $0.00
-                </h3>
-
-
-                <small id="resultadoTexto">
-                    Sin operaciones
-                </small>
-
-            </div>
-
-
-            <div class="card">
-
-                <span>
-                    OPERACIONES
-                </span>
-
-
-                <h3 id="operaciones">
-                    0
-                </h3>
-
-
-                <small>
-                    Hoy
-                </small>
-
-            </div>
-
-
-            <div class="card">
-
-                <span>
-                    RENTABILIDAD
-                </span>
-
-
-                <h3 id="rentabilidad">
-                    0.00%
-                </h3>
-
-
-                <small>
-                    Sobre capital inicial
-                </small>
-
-            </div>
-
-
-        </section>
-
-
-        <!-- GRÁFICA -->
-
-        <section class="panel">
-
-            <div class="panel-header">
+            <div class="users">
 
                 <div>
 
-                    <p>
-                        /// PERFORMANCE
-                    </p>
-
-
-                    <h2>
-                        Crecimiento del capital
-                    </h2>
-
-                </div>
-
-            </div>
-
-
-            <div class="chart-container">
-
-                <canvas
-                    id="capitalChart"
-                ></canvas>
-
-            </div>
-
-        </section>
-
-
-        <!-- REGISTRO -->
-
-        <section class="panel">
-
-            <div class="panel-header">
-
-                <div>
-
-                    <p>
-                        /// REGISTRO
-                    </p>
-
-
-                    <h2>
-                        Registrar resultado diario
-                    </h2>
-
-                </div>
-
-            </div>
-
-
-            <div class="form">
-
-
-                <div class="input-box">
-
-                    <label>
-                        RESULTADO DEL DÍA
-                    </label>
-
-
-                    <input
-                        type="number"
-                        id="ganancia"
-                        placeholder="Ej: 15.50"
-                        step="0.01"
-                    >
-
+                    <strong>
+                        JUAN MILLAN GRISALES
+                    </strong>
 
                     <small>
-                        Usa números positivos para
-                        ganancias y negativos para pérdidas.
+                        TRADER
                     </small>
 
                 </div>
 
 
-                <div class="input-box">
-
-                    <label>
-                        NÚMERO DE OPERACIONES
-                    </label>
-
-
-                    <input
-                        type="number"
-                        id="numeroOperaciones"
-                        placeholder="Ej: 8"
-                        min="0"
-                    >
-
-                </div>
-
-
-                <button
-                    onclick="registrarResultado()"
-                >
-                    + REGISTRAR OPERACIÓN
-                </button>
-
-            </div>
-
-        </section>
-
-
-        <!-- HISTORIAL -->
-
-        <section class="panel">
-
-            <div class="panel-header">
-
                 <div>
 
-                    <p>
-                        /// HISTORIAL
-                    </p>
+                    <strong>
+                        EDILBERTO MILLAN
+                    </strong>
 
-
-                    <h2>
-                        Actividad reciente
-                    </h2>
+                    <small>
+                        TRADER
+                    </small>
 
                 </div>
 
 
                 <button
-                    class="secondary"
-                    onclick="borrarHistorial()"
+                    type="button"
+                    class="secondary logout-button"
+                    onclick="cerrarSesion()"
                 >
-                    LIMPIAR
+                    CERRAR SESIÓN
                 </button>
 
             </div>
 
+        </header>
 
-            <div class="table-container">
 
-                <table>
+        <!-- ==================================
+             CONTENIDO
+        =================================== -->
 
-                    <thead>
+        <main class="container">
 
-                        <tr>
 
-                            <th>
-                                FECHA
-                            </th>
+            <!-- BIENVENIDA -->
 
-                            <th>
-```
+            <section class="welcome">
 
+                <p>
+                    /// TRADING CONTROL SYSTEM
+                </p>
+
+                <h2>
+                    Panel de control
+                </h2>
+
+                <span id="fecha"></span>
+
+            </section>
+
+
+            <!-- TARJETAS -->
+
+            <section class="cards">
+
+
+                <div class="card capital">
+
+                    <span>
+                        CAPITAL ACTUAL
+                    </span>
+
+                    <h3 id="capital">
+                        $540.00
+                    </h3>
+
+                    <small>
+                        USD
+                    </small>
+
+                </div>
+
+
+                <div class="card">
+
+                    <span>
+                        RESULTADO DE HOY
+                    </span>
+
+                    <h3 id="resultado">
+                        $0.00
+                    </h3>
+
+                    <small id="resultadoTexto">
+                        Sin operaciones
+                    </small>
+
+                </div>
+
+
+                <div class="card">
+
+                    <span>
+                        OPERACIONES
+                    </span>
+
+                    <h3 id="operaciones">
+                        0
+                    </h3>
+
+                    <small>
+                        Hoy
+                    </small>
+
+                </div>
+
+
+                <div class="card">
+
+                    <span>
+                        RENTABILIDAD
+                    </span>
+
+                    <h3 id="rentabilidad">
+                        0.00%
+                    </h3>
+
+                    <small>
+                        Sobre capital inicial
+                    </small>
+
+                </div>
+
+
+            </section>
+
+
+            <!-- ==================================
+                 GRÁFICA
+            =================================== -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <p>
+                            /// PERFORMANCE
+                        </p>
+
+                        <h2>
+                            Crecimiento del capital
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="chart-container">
+
+                    <canvas
+                        id="capitalChart"
+                    ></canvas>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==================================
+                 REGISTRO
+            =================================== -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <p>
+                            /// REGISTRO
+                        </p>
+
+                        <h2>
+                            Registrar resultado diario
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form">
+
+
+                    <div class="input-box">
+
+                        <label for="ganancia">
+                            RESULTADO DEL DÍA
+                        </label>
+
+                        <input
+                            type="number"
+                            id="ganancia"
+                            placeholder="Ej: 15.50"
+                            step="0.01"
+                        >
+
+                        <small>
+                            Usa números positivos para
+                            ganancias y negativos para pérdidas.
+                        </small>
+
+                    </div>
+
+
+                    <div class="input-box">
+
+                        <label for="numeroOperaciones">
+                            NÚMERO DE OPERACIONES
+                        </label>
+
+                        <input
+                            type="number"
+                            id="numeroOperaciones"
+                            placeholder="Ej: 8"
+                            min="0"
+                        >
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        onclick="registrarResultado()"
+                    >
+                        + REGISTRAR OPERACIÓN
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==================================
+                 HISTORIAL
+            =================================== -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <p>
+                            /// HISTORIAL
+                        </p>
+
+                        <h2>
+                            Actividad reciente
+                        </h2>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="secondary"
+                        onclick="borrarHistorial()"
+                    >
+                        LIMPIAR
+                    </button>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    FECHA
+                                </th>
+
+                                <th>
+                                    USUARIO
+                                </th>
+
+                                <th>
+                                    RESULTADO
+                                </th>
+
+                                <th>
+                                    OPERACIONES
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="historial">
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==================================
+                 CALENDARIO
+            =================================== -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <p>
+                            /// CALENDARIO
+                        </p>
+
+                        <h2>
+                            Resultados diarios
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="calendar">
+
+                    <div class="calendar-header">
+
+                        <button
+                            type="button"
+                            onclick="mesAnterior()"
+                        >
+                            ◀
+                        </button>
+
+                        <h3 id="mesActual">
+                            SEPTIEMBRE 2026
+                        </h3>
+
+                        <button
+                            type="button"
+                            onclick="mesSiguiente()"
+                        >
+                            ▶
+                        </button>
+
+                    </div>
+
+
+                    <div class="calendar-weekdays">
+
+                        <span>
+                            LUN
+                        </span>
+
+                        <span>
+                            MAR
+                        </span>
+
+                        <span>
+                            MIÉ
+                        </span>
+
+                        <span>
+                            JUE
+                        </span>
+
+                        <span>
+                            VIE
+                        </span>
+
+                        <span>
+                            SÁB
+                        </span>
+
+                        <span>
+                            DOM
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="calendarioDias"
+                        class="calendar-days"
+                    ></div>
+
+
+                    <div class="calendar-legend">
+
+                        <span>
+                            <i class="legend-positive"></i>
+                            Ganancia
+                        </span>
+
+                        <span>
+                            <i class="legend-negative"></i>
+                            Pérdida
+                        </span>
+
+                        <span>
+                            <i class="legend-neutral"></i>
+                            Sin operación
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ==================================
+                 ESTADÍSTICAS
+            =================================== -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <p>
+                            /// ESTADÍSTICAS
+                        </p>
+
+                        <h2>
+                            Resumen general
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="cards">
+
+
+                    <div class="card">
+
+                        <span>
+                            GANANCIA TOTAL
+                        </span>
+
+                        <h3 id="gananciaTotal">
+                            $0.00
+                        </h3>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <span>
+                            TOTAL OPERACIONES
+                        </span>
+
+                        <h3 id="totalOperaciones">
+                            0
+                        </h3>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <span>
+                            DÍAS REGISTRADOS
+                        </span>
+
+                        <h3 id="diasRegistrados">
+                            0
+                        </h3>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+        </main>
+
+
+        <!-- ==================================
+             FOOTER
+        =================================== -->
+
+        <footer>
+
+            <p>
+                ⚡ MILLAN TRADING
+            </p>
+
+            <span>
+                Sistema de control de operaciones
+            </span>
+
+        </footer>
+
+
+    </div>
+
+
+    <!-- ======================================
+         JAVASCRIPT DE MILLAN TRADING
+    ======================================= -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
