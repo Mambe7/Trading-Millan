@@ -169,14 +169,29 @@ async function mostrarAplicacion() {
 
 async function iniciarSesion() {
 
-    const email =
-        document.getElementById("loginEmail").value.trim();
+    const emailElemento =
+        document.getElementById("loginEmail");
 
-    const password =
-        document.getElementById("loginPassword").value;
+    const passwordElemento =
+        document.getElementById("loginPassword");
 
     const mensaje =
         document.getElementById("loginMessage");
+
+    if (!emailElemento || !passwordElemento || !mensaje) {
+
+        console.error(
+            "No se encontraron los elementos del formulario de login."
+        );
+
+        return;
+    }
+
+    const email =
+        emailElemento.value.trim();
+
+    const password =
+        passwordElemento.value;
 
     if (!email || !password) {
 
@@ -208,16 +223,16 @@ async function iniciarSesion() {
             }
         );
 
-        const datos = await respuesta.json();
+        const datos =
+            await respuesta.json();
+
+        console.log("Respuesta login:", datos);
 
         if (!respuesta.ok) {
 
-            console.error(
-                "Error de inicio de sesión:",
-                datos
-            );
-
             mensaje.textContent =
+                datos.error_description ||
+                datos.msg ||
                 "Correo o contraseña incorrectos.";
 
             return;
@@ -233,7 +248,8 @@ async function iniciarSesion() {
             datos.refresh_token
         );
 
-        usuarioActual = datos.user;
+        usuarioActual =
+            datos.user;
 
         mensaje.textContent =
             "Acceso correcto.";
@@ -242,10 +258,13 @@ async function iniciarSesion() {
 
     } catch (error) {
 
-        console.error("Error:", error);
+        console.error(
+            "Error iniciando sesión:",
+            error
+        );
 
         mensaje.textContent =
-            "No se pudo conectar con el servidor.";
+            "No se pudo conectar con Supabase.";
 
     }
 
@@ -288,8 +307,13 @@ async function cerrarSesion() {
 
     }
 
-    localStorage.removeItem("millan_access_token");
-    localStorage.removeItem("millan_refresh_token");
+    localStorage.removeItem(
+        "millan_access_token"
+    );
+
+    localStorage.removeItem(
+        "millan_refresh_token"
+    );
 
     usuarioActual = null;
 
@@ -341,13 +365,17 @@ async function cargarDatos() {
             return;
         }
 
-        registros = await respuesta.json();
+        registros =
+            await respuesta.json();
 
         actualizarInterfaz();
 
     } catch (error) {
 
-        console.error("Error:", error);
+        console.error(
+            "Error cargando datos:",
+            error
+        );
 
     }
 
@@ -504,7 +532,9 @@ async function registrarResultado() {
 
     if (isNaN(resultado)) {
 
-        alert("Ingresa un resultado válido.");
+        alert(
+            "Ingresa un resultado válido."
+        );
 
         return;
     }
@@ -521,7 +551,8 @@ async function registrarResultado() {
     const hoy =
         new Date().toISOString().split("T")[0];
 
-    let nombreUsuario = "Usuario";
+    let nombreUsuario =
+        "Usuario";
 
     if (
         usuarioActual &&
@@ -608,7 +639,10 @@ async function registrarResultado() {
 
     } catch (error) {
 
-        console.error("Error:", error);
+        console.error(
+            "Error:",
+            error
+        );
 
         alert(
             "Error de conexión con Supabase."
@@ -677,7 +711,8 @@ function actualizarEstadisticas() {
     let totalGanancia = 0;
     let totalOperaciones = 0;
 
-    const dias = new Set();
+    const dias =
+        new Set();
 
     registros.forEach(function (registro) {
 
@@ -689,7 +724,9 @@ function actualizarEstadisticas() {
 
         if (registro.Fecha) {
 
-            dias.add(registro.Fecha);
+            dias.add(
+                registro.Fecha
+            );
 
         }
 
@@ -763,7 +800,8 @@ function actualizarGrafico() {
         const resultado =
             Number(registro.Resultado) || 0;
 
-        acumulado += resultado;
+        acumulado +=
+            resultado;
 
         acumuladoPorFecha[fecha] =
             acumulado;
@@ -786,39 +824,40 @@ function actualizarGrafico() {
 
     }
 
-    capitalChart = new Chart(
-        canvas,
-        {
-            type: "line",
+    capitalChart =
+        new Chart(
+            canvas,
+            {
+                type: "line",
 
-            data: {
+                data: {
 
-                labels: fechas,
+                    labels: fechas,
 
-                datasets: [
-                    {
-                        label: "Capital",
+                    datasets: [
+                        {
+                            label: "Capital",
 
-                        data: capitales,
+                            data: capitales,
 
-                        tension: 0.3,
+                            tension: 0.3,
 
-                        fill: false
-                    }
-                ]
+                            fill: false
+                        }
+                    ]
 
-            },
+                },
 
-            options: {
+                options: {
 
-                responsive: true,
+                    responsive: true,
 
-                maintainAspectRatio: false
+                    maintainAspectRatio: false
+
+                }
 
             }
-
-        }
-    );
+        );
 
 }
 
@@ -1097,7 +1136,10 @@ async function borrarHistorial() {
 
     } catch (error) {
 
-        console.error("Error:", error);
+        console.error(
+            "Error:",
+            error
+        );
 
         alert(
             "Error de conexión."
@@ -1109,7 +1151,7 @@ async function borrarHistorial() {
 
 
 // ==========================================
-// FUNCIONES GLOBALES
+// HACER FUNCIONES GLOBALES
 // ==========================================
 
 window.iniciarSesion =
@@ -1155,4 +1197,3 @@ setInterval(
     },
     5000
 );
-
